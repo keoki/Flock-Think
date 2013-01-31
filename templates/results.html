@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- Boostrap -->
+<link type="text/css" href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+  <div class="row">
+    <div class="span5">
+      {% for name, tweet in good %}
+      <br>
+      {{name}}: {{ tweet }}
+      {% endfor %}
+    </div>
+    <div class="span2"> 
+      {% for name, tweet in irr %}
+      <br>
+      {{name}}: {{ tweet }}
+      {% endfor %}
+    </div>
+    <div class="span5">
+      {% for name, tweet in bad %}
+      <br>
+      {{name}}: {{ tweet }}
+      {% endfor %}
+    </div>
+  </div>
+
+  <form class="form-search" action="/search" method="POST" >
+    <input type="text" name='search_text' class="input-medium search-query">
+    <button type="submit" class="btn">Search</button>
+  </form>
+
+</body>
+
+</html>
