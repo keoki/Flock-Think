@@ -1,24 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <!-- Boostrap -->
 <link type="text/css" href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
-	<script src="http://d3js.org/d3.v3.min.js"></script>
 
 	<h2> <center> <p>
 		{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>!
 	</p> </center> </h2>
 	<div class="span5">
+		<h3><p> Positive Tweets </p></h3>
 		{% for name, tweet in pos %}
 		<p> {{name}}: {{ tweet }} </p>
 		{% endfor %}
-		<br> Word Cloud <br>
+		<h3><p> Word Cloud </p></h3>
 		{% for word, score in pos_words %}
-		{{word}} ({{score}}) 
+		<a href="/search/{{word}}">{{word}}</a> ({{score}}) 
 		<br>
 		{% endfor %}
 	</div>
@@ -30,12 +29,13 @@
 	</div>
 
 	<div class="span5">
+		<h3><p> Negative Tweets </p></h3>
 		{% for name, tweet in neg %}
 		<p> {{name}}: {{ tweet }} </p>
 		{% endfor %}
-		<br> Word Cloud <br>
+		<h3><p> Word Cloud </p></h3>
 		{% for word, score in neg_words %}
-		{{word}} ({{score}}) 
+		<a href="/search/{{word}}">{{word}}</a> ({{score}}) 
 		<br>
 		{% endfor %}
 
@@ -45,6 +45,9 @@
   <form class="form-search" action="/search" method="POST" >
     <input type="text" name='search_text' class="input-medium search-query">
     <button type="submit" class="btn">Raw Sentiment Search</button>
+
+	  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+		<script src="http://d3js.org/d3.v3.min.js"></script>
 
 </body>
 

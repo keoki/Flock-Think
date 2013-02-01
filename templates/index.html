@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <!-- Boostrap -->
 <link type="text/css" href="/static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body>
-  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
-<div class="row span4 offset4" style="margin-top: 100px">
+	
+<div class="jumbotron" style="margin-top: 50px">
+<center>	<h1>Welcome to sentiment.ly</h1>
+	Sentiment.ly is the twitter search engine for instant sentiment analysis.
+	<br>
+	<br>
+ <form class="form-search search-query" action="/search" method="POST" >
+  <p><input type="text" name='search_text' placeholder='@BarackObama, #iPhone5, futbol' class="input-xlarge search-query"> </p>
+  <p><button type="submit" class="btn btn-large btn-primary">Search</button> </p>
+</form></center>
 
-<form class="form-search" action="/search" method="POST" >
-  <input type="text" name='search_text' class="input-medium search-query">
-  <button type="submit" class="btn">Search</button>
-</form>
 </div>
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
 </body>
 </html>

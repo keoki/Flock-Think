@@ -18,21 +18,36 @@ def authenticate():
     CONSUMER_SECRET = "I0EVikHnnGU6wAzL7gl1nNuejIu2YuUiheleG7DtQIY"
     return twitter.OAuth(OAUTH_TOKEN, OAUTH_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
 
-def search_tweets(term, auth=None, result_type="recent", limit=100, lang='en'):
-    """ Uses the Twitter API to search for tweets.  Returns a json dict of
-    tweets according to the search term.
+def search_tweets(term, auth=None, result_type="recent", limit=300, lang='en'):
+    """ Uses the Twitter API to search for tweets.  Returns a list of json 
+    dicts of tweets according to the search term.
     """
     if not auth:
         auth = authenticate()
-    if limit > 100:
-        print "limit %d is too large, resetting to 100" % limit
-        limit = 100
+
+    # it's not clear from the twitter API if page works with rpp != 100, so for now force rpp/fetchlimit 100.  This means we can only request pages of 100 at a time.
+    fetchlimit = 100
+    if limit % fetchlimit != 0:
+        print "limit %d not a multiple of 100, rounding to nearest" % limit
+        limit = fetchlimit * int(round(float(limit) / fetchlimit))
+
+    if limit > 1500:
+        print "limit %d is too large, resetting to 1500" % limit
+        limit = 1500
 
     ts = twitter.Twitter(domain="search.twitter.com", auth=auth)
-    return ts.search(q=term,
+
+    print limit, fetchlimit, limit//fetchlimit
+    result = []
+    for p in range(limit // fetchlimit):
+        print len(result)
+        result.extend( ts.search(q=term,
                     result_type="recent",
-                    rpp=limit,
-                    include_entities = 'true')['results']
+                    rpp=fetchlimit,
+                    page=p+1,
+                    lang = lang,
+                    include_entities = 'true')['results'])
+    return result
 
 def remove_tweets(tweets, remove_rt = True ):
     """ filter tweets on criteria. Right now it just removes Retweets.
@@ -49,10 +64,10 @@ def remove_tweets(tweets, remove_rt = True ):
                 ol = len(tweets)
                 tweets.remove(t)
                 nl = len(tweets)
-                print 'found RT match', t['text'], ol, nl
+                print 'RT remove:', t['text'], ol, nl
                 continue
             else:
-                print 'no RT match', t['text']
+                print t['text']
     return tweets
 
 def get_raw_sentiment(tweets):
@@ -75,10 +90,14 @@ def sort_by_sentiment(tweets):
     """
     threshold = 0.5
     st = get_raw_sentiment(tweets)
+
+    # rank the elements by score happy to sad.
+    st.sort(reverse=True)
     pos = list()
     neg = list()
-
     [pos.append(t) if p > threshold else neg.append(t) for (p, n, t) in st]
+    # reversing the negative ones puts the saddest at the top
+    neg.reverse()
 
     return pos, neg
 
@@ -90,7 +109,7 @@ def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5):
         combined_tweets = filter(lambda w: not w in stopwords, combined_tweets.split())
     else:
         combined_tweets = combined_tweets.split()
-    
+    # possible use 2-grams to get top as well.
     cutoff_combined = list()
     for keyword, count in nltk.FreqDist(combined_tweets).iteritems():
         if count >= cutoff:
@@ -106,7 +125,7 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     """
     import string, operator, re
 
-    http_str = re.compile("(http://t.co/)(\w)+ ")    
+    http_str = re.compile("(htt[p|ps]://t.co/)(\w)+ ")    
     # for now, keep the @ and # since they're special to twitter
     sp = string.punctuation.replace("#","").replace("@","")
 

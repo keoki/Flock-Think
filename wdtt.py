@@ -10,7 +10,7 @@ auth = ts.authenticate()
 
 title = "What does Twitter think?"
 
-@app.route("/")
+@app.route('/')
 def search_page():
     return render_template("index.html", title=title)
 
@@ -21,10 +21,8 @@ def search_page():
 # #    pos, pos_word, neg, neg_words
 #     return render_template('results_raw.html', scores=formatted_scores)
 
-
-@app.route("/search", methods=['POST'])
-def search():
-    term = request.form['search_text']
+@app.route('/search/<term>')
+def sbp(term):
     pos, neg, top_pos, top_neg = ts.search_get_sentiment(term, auth)
     p = [ (t['from_user'], t['text']) for t in pos]
     n = [ (t['from_user'], t['text']) for t in neg]
@@ -53,6 +51,9 @@ def search():
 
     return render_template("results.html", pos=p, pos_words=top_pos, neg=n, neg_words=top_neg, stats=stats, text=text)
 
+@app.route('/search', methods=['POST'])
+def search():
+    return redirect(url_for('sbp', term=request.form['search_text']))
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
