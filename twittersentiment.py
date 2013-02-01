@@ -10,6 +10,9 @@ with open(cl, 'r') as f:
     classifier = pickle.load(f)
 
 stopwords = stopwords.words("english")
+stopwords.append("via")
+#stopwords.append("rt")
+#stopwords.append("RT")
 
 def authenticate():
     OAUTH_TOKEN="167133966-EnnTYkbphBbmwo9FFd2hwv5JSkOaNSRSBsh4LzY"
@@ -125,7 +128,7 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     """
     import string, operator, re
 
-    http_str = re.compile("(htt[p|ps]://t.co/)(\w)+ ")    
+    http_str = re.compile("(htt[p|ps]://t.co/)\w{8}")    
     # for now, keep the @ and # since they're special to twitter
     sp = string.punctuation.replace("#","").replace("@","")
 
@@ -133,7 +136,8 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     if type(words) == unicode:
         words = words.encode("ascii", errors="ignore")
 
-    if type(words) == str:        
+    print words
+    if type(words) == str:
         if remove_http:
             words = re.sub(http_str, "", words)
         if lower:
@@ -152,6 +156,7 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     else:
         print "not list or string, not normalizing"
 
+    print words
     return words
 
 def get_sentiment(tweets):
