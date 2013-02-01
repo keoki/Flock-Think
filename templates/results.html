@@ -7,31 +7,44 @@
 
 <body>
   <script src="/static/bootstrap/js/bootstrap.min.js"></script>
-  <div class="row">
-    <div class="span5">
-      {% for name, tweet in good %}
-      <br>
-      {{name}}: {{ tweet }}
-      {% endfor %}
-    </div>
-    <div class="span2"> 
-      {% for name, tweet in irr %}
-      <br>
-      {{name}}: {{ tweet }}
-      {% endfor %}
-    </div>
-    <div class="span5">
-      {% for name, tweet in bad %}
-      <br>
-      {{name}}: {{ tweet }}
-      {% endfor %}
-    </div>
-  </div>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
 
+	<h2> <center> <p>
+		{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>!
+	</p> </center> </h2>
+	<div class="span5">
+		{% for name, tweet in pos %}
+		<p> {{name}}: {{ tweet }} </p>
+		{% endfor %}
+		<br> Word Cloud <br>
+		{% for word, score in pos_words %}
+		{{word}} ({{score}}) 
+		<br>
+		{% endfor %}
+	</div>
+
+	<div class="span2">
+		<br>
+		# pos: {{stats.pos}} (wc: {{stats.top_pos}} ) <br>
+		# neg: {{stats.neg}} (wc: {{stats.top_neg}} ) <br>
+	</div>
+
+	<div class="span5">
+		{% for name, tweet in neg %}
+		<p> {{name}}: {{ tweet }} </p>
+		{% endfor %}
+		<br> Word Cloud <br>
+		{% for word, score in neg_words %}
+		{{word}} ({{score}}) 
+		<br>
+		{% endfor %}
+
+	</div>
+	<br>
+	<div class="span12"></div>
   <form class="form-search" action="/search" method="POST" >
     <input type="text" name='search_text' class="input-medium search-query">
-    <button type="submit" class="btn">Search</button>
-  </form>
+    <button type="submit" class="btn">Raw Sentiment Search</button>
 
 </body>
 
