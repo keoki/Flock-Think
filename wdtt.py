@@ -52,10 +52,10 @@ def sbp(term):
 
     # trim top tweets down.  pos/neg are sorted by sentiment
     tweet_limit = 8
-    print "pos before", len(pos)
+    # print "pos before", len(pos)
     pos = trim_tweets(pos, tweet_limit)
     neg = trim_tweets(neg, tweet_limit)
-    print "pos after", len(pos)
+    # print "pos after", len(pos)
     p = [ (t['from_user'], t['text']) for t in pos]
     n = [ (t['from_user'], t['text']) for t in neg]
 
@@ -76,4 +76,4 @@ def search():
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.debug = True
-    app.run(port=port)
+    app.run(host='0.0.0.0', port=port)

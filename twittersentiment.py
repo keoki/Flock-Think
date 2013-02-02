@@ -10,9 +10,9 @@ with open(cl, 'r') as f:
     classifier = pickle.load(f)
 
 stopwords = stopwords.words("english")
-stopwords.append("via")
-#stopwords.append("rt")
-#stopwords.append("RT")
+# stopwords.append("via")
+# stopwords.append("rt")
+# stopwords.append("RT")
 
 def authenticate():
     OAUTH_TOKEN="167133966-EnnTYkbphBbmwo9FFd2hwv5JSkOaNSRSBsh4LzY"
@@ -40,10 +40,8 @@ def search_tweets(term, auth=None, result_type="recent", limit=300, lang='en'):
 
     ts = twitter.Twitter(domain="search.twitter.com", auth=auth)
 
-    print limit, fetchlimit, limit//fetchlimit
     result = []
     for p in range(limit // fetchlimit):
-        print len(result)
         result.extend( ts.search(q=term,
                     result_type="recent",
                     rpp=fetchlimit,
