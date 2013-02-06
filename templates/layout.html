@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- Boostrap -->
+	<link type="text/css" href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+	<link type="text/css" href="/static/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="/static/jqcloud.css" />
+	<style type="text/css">
+	body {
+	  padding-top: 60px;
+	  padding-bottom: 40px;
+	}
+	</style>
+</head>
+
+
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+	  <div class="navbar-inner">
+	    <div class="container">
+	      <a class="brand" href="/">Sentiment.ly</a>
+	      <div class="nav-collapse collapse">
+	        <ul class="nav">
+	          <li><a href="/about">About</a></li>
+	          <li><a href="/contact">Contact</a></li>
+	        </ul>
+				 	<form class="navbar-form pull-right" action="/search" method="POST" >
+				  	<input type="text" name='search_text' placeholder='@twitter, #iphone5, rainbows' class="span3">
+				  	<button type="submit" class="btn btn-primary">Search</button>
+					</form>
+	      </div><!--/.nav-collapse -->
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="container">
+		{% block content %}
+		{% endblock %}
+	</div>
+
+	<script src="/static/bootstrap/js/bootstrap.js"></script>
+</body>
+
+</html>

@@ -1,105 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<!-- Boostrap -->
-<link type="text/css" href="/static/bootstrap/css/bootstrap.css" rel="stylesheet">
-<link rel="stylesheet" type="text/css" href="/static/jqcloud.css" />
+		{% extends "layout.html" %}
+		{% block content %}
+		<div class="span12">
+			<center><h1>
+				{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>!
+			</h1></center>
+		</div>
+		<div class="row-fluid">
+			<div class="span5">
+				<h3> Positive Tweets </h3>
+				{% for tweet in pos %}
+				<p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p>
+				{% endfor %}
+				<div id="positive" style="width: 350px; height: 350px;"> <!-- Div for Word Cloud--> </div>
 
-</head>
+			</div>
+			<div class="span2">
+				<p># pos: {{stats.pos}}</p>
+				<p># neg: {{stats.neg}}</p>
+			</div>
+			<div class="span5">
+				<h3> Negative Tweets </h3>
+				{% for tweet in neg %}
+				<p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p>
+				{% endfor %}
+				<div id="negative" style="width: 350px; height: 350px;"> <!-- Div for Word Cloud--> </div>
+			</div>
+		</div>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+		<script type="text/javascript" src="/static/jqcloud-1.0.2.min.js"></script>
 
-<body onLoad="">
+		<script>
+		var pos_word_array = [
+		{% for word, formatted, score in pos_words %}
+		{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
+		{%endfor%}
+		];
 	
-	<h2> <center> <p>
-		{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>!
-	</p> </center> </h2>
-	<div class="span5">
-		<h3><p> Positive Tweets </p></h3>
-		{% for tweet in pos %}
-		<p>@{{tweet['from_user']}}: {{ tweet['text'] }} </p>
-		{% endfor %}
-		<div id="positive" style="width: 350px; height: 350px;"> </div>
-	</div>
+		$(function() { 
+			$("#positive")
+			.jQCloud(pos_word_array);
+		});
 
-	<div class="span2">
-		<br>
-		# pos: {{stats.pos}} <br>
-		# neg: {{stats.neg}} <br>
-		<!-- <script>
-		var data = [ {{stats.pos}}, {{stats.neg}} ];
-	  var chart = d3.select("body").append("svg")
-			.attr("class", "chart")
-			.attr("width", 420)
-			.attr("height", 20 * data.length);
-		var x = d3.scale.linear()
-			.domain([0, d3.max(data)])
-			.range([0, 420]);
-
-		chart.selectAll("rect")
-			.data(data)
-		 	.enter().append("rect")
-		 	.attr("y", function(d, i) { return i * 20; })
-		 	.attr("width", x)
-		 	.attr("height", 20);
-
-		 </script>
-		 <style>
-		 .chart rect {
-		 		stroke: white;
-		 	 	fill: steelblue;
-			}
-			</style>
- -->
-	</div>
-
-
-	<div class="span5">
-		<h3><p> Negative Tweets </p></h3>
-		{% for tweet in neg %}
-		<p>@{{tweet['from_user']}}: {{ tweet['text'] }} </p>
-		{% endfor %}
-		<div id="negative" style="width: 350px; height: 350px;"> </div>
-
-	</div>
-
-	<div class="jumbotron"></div>
-	<div class="jumbotron">
-		<center>
-	 <form class="form-search search-query" action="/search" method="POST" >
-	  <p><input type="text" name='search_text' placeholder='@twitter, #iphone5, rainbows' class="input-large search-query"> </p>
-	  <p><button type="submit" class="btn btn-large btn-primary">Search</button> </p>
-	</form></center>
-
-	</div>
-  <script src="/static/bootstrap/js/bootstrap.js"></script>
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/jqcloud-1.0.2.min.js"></script>
-
-	<script>
-	var pos_word_array = [
-	{% for word, formatted, score in pos_words %}
-	{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
-	{%endfor%}
-	];
+		var neg_word_array = [
+		{% for word, formatted, score in neg_words %}
+		{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
+		{%endfor%}
+		];
 	
-	$(function() { 
-		$("#positive")
-		.jQCloud(pos_word_array);
-	});
+		$(function() { 
+			$("#negative")
+			.jQCloud(neg_word_array);
+		});
 
-	var neg_word_array = [
-	{% for word, formatted, score in neg_words %}
-	{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
-	{%endfor%}
-	];
-	
-	$(function() { 
-		$("#negative")
-		.jQCloud(neg_word_array);
-	});
+		</script>
 
-	</script>
-
-		
-</body>
-
-</html>
+		{% endblock %}
