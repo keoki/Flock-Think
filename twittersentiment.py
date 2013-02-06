@@ -104,6 +104,8 @@ def sort_by_sentiment(tweets):
 
 def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5):
     """get top words from tweet list.  Filter_term is used to remove terms from list (ie: search terms)
+    cutoff - # of occurrences in order to call it good.
+    
     """
     combined_tweets = norm_words(" ".join([t['text'] for t in tweetlist]))
     if filter_common:
@@ -126,7 +128,7 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     """
     import string, operator, re
 
-    http_str = re.compile("(htt[p|ps]://t.co/)\w{8}")    
+    http_str = re.compile('htt[p|ps]://t.co/[a-zA-Z0-9\-\.]{8}')   
     # for now, keep the @ and # since they're special to twitter
     sp = string.punctuation.replace("#","").replace("@","")
 
@@ -154,7 +156,7 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     else:
         print "not list or string, not normalizing"
 
-    print words
+    # print words
     return words
 
 def get_sentiment(tweets):
