@@ -11,18 +11,29 @@ auth = ts.authenticate()
 
 title = "What does Twitter think?"
 
+def trim_tweets(t, tl = 8):
+    return t[:tl] if len(t) > tl else t 
+
+def get_word(sent_pct):
+    """returns the approrpiate list of words, and colors for a sentiment between 0 (bad) and 1 (good)."""
+    if sent_pct > 0.8:
+        return ["terrific", "awesome", "amazing", "fabulous" ], "#67FF00"
+    elif sent_pct > 0.6:
+        return ["rad", "good", "sweet", "great"], "#67FF00"
+    elif sent_pct > 0.4:
+        return ["so so", "alright", "okay"], "#000000"
+    elif sent_pct > 0.2:
+        return [ "poor", "icky", "smelly" ], "FF0083"
+    else:
+        return ["terrible", "awful", "bad" ], "FF0083"
+
 @app.route('/')
 def search_page():
     return render_template("index.html", title=title)
 
-# @app.route("/rawsearch", methods=['POST'])
-# def rawsearch():
-#     scores = ts.search_get_raw_sentiment(request.form['search_text'], auth)
-# #    formatted_scores = [ (p, n, t['from_user'], t['text']) for (p, n, t) in scores ]
-# #    pos, pos_word, neg, neg_words
-#     return render_template('results_raw.html', scores=formatted_scores)
-def trim_tweets(t, tl = 8):
-    return t[:tl] if len(t) > tl else t 
+@app.route('/about')
+def about():
+    return render_template("about.html")
 
 @app.route('/search/<term>')
 def sbp(term):
@@ -34,21 +45,10 @@ def sbp(term):
     stats['neg'] = len(neg)
     stats['top_pos'] = len(top_pos)
     stats['top_neg'] = len(top_neg)
+    stats['pct_pos'] = int(100.0*stats['pos']/float(stats['pos'] + stats['neg']))
+    stats['pct_neg'] = 100 - stats['pct_pos']
 
-
-    pos_words = ["amazing", "good", "great", "awesome", "fabulous", "terrific", "rad", "sweet"]
-    neg_words = ["terrible", "poor", "smelly", "bad", "awful", "icky"]
-    neu_words = ["so so", "alright", "okay"]
-
-    if len(pos) > len(neg):
-        words = pos_words
-        color = "#67FF00"
-    elif len(pos) == len(neg):
-        words = neu_words
-        color = "#FFFFFF"
-    else:
-        words = neg_words
-        color = "#FF0083"
+    words, color = get_word(stats['pct_pos']/100.0)
 
     # trim top tweets down.  pos/neg are sorted by sentiment
     tweet_limit = 8

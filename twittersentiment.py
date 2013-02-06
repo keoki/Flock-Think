@@ -72,6 +72,9 @@ def remove_tweets(tweets, remove_rt = True ):
     return tweets
 
 def get_raw_sentiment(tweets):
+    return get_raw_sentiment_orig(tweets)
+
+def get_raw_sentiment_orig(tweets):
     """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
     Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
     """
@@ -102,10 +105,12 @@ def sort_by_sentiment(tweets):
 
     return pos, neg
 
-def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5):
+def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5, remove_words_shorter_than=3):
     """get top words from tweet list.  Filter_term is used to remove terms from list (ie: search terms)
     cutoff - # of occurrences in order to call it good.
-    
+    filter_common = remove common words
+    filter_term - other term to remove (ie: search term)
+    remove_words_shorter_than - remove words shorter than or equal to this value
     """
     combined_tweets = norm_words(" ".join([t['text'] for t in tweetlist]))
     if filter_common:
@@ -116,6 +121,8 @@ def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5):
     cutoff_combined = list()
     for keyword, count in nltk.FreqDist(combined_tweets).iteritems():
         if count >= cutoff:
+            if len(keyword) <= remove_words_shorter_than:
+                continue
             if keyword != filter_term:
                 cutoff_combined.append((keyword, count))
     return cutoff_combined
