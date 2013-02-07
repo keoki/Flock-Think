@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 cl = "/Volumes/Haoma/keoki/datascience/insight-product/repos/sentiment_classifier/src/senti_classifier/classifier-NaiveBayes.tweets.pickle"
 cl = "/scratch/classifier-NaiveBayes.tweets.pickle"
 # cl = "/Volumes/Haoma/keoki/datascience/insight-product/bayes.pkl"
-cl = "/Volumes/Haoma/keoki/datascience/insight-product/bayes-sklearn.pkl"
+cl = "bayes-sklearn.pkl"
 try:
     classifier
 except NameError:
