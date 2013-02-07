@@ -1,10 +1,11 @@
 import os
-from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash, _app_ctx_stack
-import twittersentiment as ts
 import random
-import urllib
 from dateutil.parser import parse
+import urllib
+
+from flask import Flask, request, redirect, url_for, render_template
+
+import twittersentiment as ts
 
 app = Flask(__name__)
 #app.config.from_object = (__name__)
