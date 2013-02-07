@@ -7,7 +7,7 @@
 		</style>
 		<div class="span12">
 			<center><h1>
-				{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>!
+				{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>
 			</h1></center>
 			<br>
 		</div>
@@ -75,7 +75,9 @@
     color = d3.scale.category10();     //builtin range of colors
  
 		data = [{"label":":)", "value": {{stats.pct_pos}}}, 
-		        {"label":":(", "value": {{stats.pct_neg}}}
+		        {"label":":(", "value": {{stats.pct_neg}}},
+		        {"label":":|", "value": {{stats.pct_neu}}},
+						
 						];
     
     var vis = d3.select("#chart")

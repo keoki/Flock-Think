@@ -1,13 +1,19 @@
 import twitter
 from senti_classifier import senti_classifier as sc
+import sentiment
 import pickle
 import nltk
 from nltk.corpus import stopwords
 
 cl = "/Volumes/Haoma/keoki/datascience/insight-product/repos/sentiment_classifier/src/senti_classifier/classifier-NaiveBayes.tweets.pickle"
 cl = "/scratch/classifier-NaiveBayes.tweets.pickle"
-with open(cl, 'r') as f:
-    classifier = pickle.load(f)
+# cl = "/Volumes/Haoma/keoki/datascience/insight-product/bayes.pkl"
+cl = "/Volumes/Haoma/keoki/datascience/insight-product/bayes-sklearn.pkl"
+try:
+    classifier
+except NameError:
+    with open(cl, 'r') as f:
+        classifier = pickle.load(f)
 
 stopwords = stopwords.words("english")
 # stopwords.append("via")
@@ -62,17 +68,11 @@ def remove_tweets(tweets, remove_rt = True ):
     for t in tweets:
         if rt_regex:
             if re.search(rt_regex, t['text']):
-                ol = len(tweets)
                 tweets.remove(t)
-                nl = len(tweets)
-                print 'RT remove:', t['text'], ol, nl
-                continue
-            else:
-                print t['text']
     return tweets
 
 def get_raw_sentiment(tweets):
-    return get_raw_sentiment_orig(tweets)
+    return get_raw_sentiment_sk(tweets)
 
 def get_raw_sentiment_orig(tweets):
     """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
@@ -80,7 +80,6 @@ def get_raw_sentiment_orig(tweets):
     """
     v = []
     for t in tweets:
-        # print pprint.pprint(t)
         tokens = bag_of_words(t['text'].split())
 
         probs = classifier.prob_classify(tokens)
@@ -89,8 +88,38 @@ def get_raw_sentiment_orig(tweets):
 
     return v
 
+def get_raw_sentiment_new(tweets):
+    """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
+    Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
+    """
+    v = []
+    for t in tweets:
+        features = sentiment.extract_words(t['text'])
+        v.append( dict(zip(features, map(lambda a: True, features))) )
+    result = classifier.batch_prob_classify(v)
+    # print "result", result
+    r = []
+    # bug here: v is enumerated and set.  fix
+    for i, v in enumerate(v):
+        r.append( (result[i].prob("pos"), result[i].prob("neg"), tweets[i])) 
+    return r
+
+def get_raw_sentiment_sk(tweets):
+    """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
+    Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
+    """
+    t = [t['text'] for t in tweets]
+    result = classifier.predict_proba(t)
+    # print "result", result
+    r = []
+    for i, v in enumerate(result):
+        r.append( (v[1], v[0], tweets[i]))
+        print v[1], v[0], tweets[i]['text']
+    # print r
+    return r
+
 def sort_by_sentiment(tweets):
-    """ Sorts tweets by sentiment
+    """ Sorts tweets by sentiment.
     """
     threshold = 0.5
     st = get_raw_sentiment(tweets)
@@ -104,6 +133,29 @@ def sort_by_sentiment(tweets):
     neg.reverse()
 
     return pos, neg
+    
+def sort_by_sentiment(tweets):
+    """ Sorts tweets by sentiment.
+    """
+    threshold = 0.5
+    st = get_raw_sentiment(tweets)
+
+    st.sort(reverse=True)
+    pos = []
+    neu = []
+    neg = []
+    for (p, n, t) in st:
+        if p > 0.66:
+            pos.append(t)
+        elif p > 0.33:
+            neu.append(t)
+        else:
+            neg.append(t)
+
+    # reversing puts negatives at the top.
+    neg.reverse()
+
+    return pos, neu, neg
 
 def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5, remove_words_shorter_than=3):
     """get top words from tweet list.  Filter_term is used to remove terms from list (ie: search terms)
@@ -143,15 +195,19 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     if type(words) == unicode:
         words = words.encode("ascii", errors="ignore")
 
-    print words
+    # print words
     if type(words) == str:
+        # print words
         if remove_http:
             words = re.sub(http_str, "", words)
+        # print words
         if lower:
             words = words.lower()
+        # print words
         if remove_punctuation:
             table = string.maketrans(sp, " "*len(sp))
             words = words.translate(table)
+        # print words
     elif type(words) in (list, tuple):
         if remove_http:
             words = [re.sub(http_str, "", w) for w in words]
@@ -166,27 +222,6 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     # print words
     return words
 
-def get_sentiment(tweets):
-    """
-    """
-    # for now, make 3 categories for tweets, 1: good, 2: bad, 3: irrelevant
-    good = []
-    bad = []
-    irrelevant = []
-    for i, t in enumerate(tweets, start=1):
-        idx = i % 3
-        v = (t['from_user'], t['text'])
-        if idx == 0:
-            good.append(v)
-        elif idx == 1:
-            bad.append(v)
-        else: # idx == 2
-            irrelevant.append(v)
-    return good, bad, irrelevant
-
-def search_get_sentiment(term, auth=None):
-    return get_sentiment(search_tweets(term, auth=auth))
-
 def search_get_raw_sentiment(term, auth=None):
     tw = search_tweets(term, auth=auth)
     tw = remove_tweets(tw, remove_rt=True)
@@ -195,9 +230,9 @@ def search_get_raw_sentiment(term, auth=None):
 def search_get_sentiment(term, auth=None):
     raw = search_tweets(term, auth=auth)
     filtered = remove_tweets(raw)
-    pos, neg = sort_by_sentiment(filtered)
+    pos,neu, neg = sort_by_sentiment(filtered)
 
     top_pos = get_top(pos, filter_term=term.lower())
     top_neg = get_top(neg, filter_term=term.lower())
-    return pos, neg, top_pos, top_neg
+    return pos, neg, top_pos, top_neg, neu
  

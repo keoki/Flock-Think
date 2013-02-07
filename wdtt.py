@@ -14,18 +14,22 @@ title = "What does Twitter think?"
 def trim_tweets(t, tl = 8):
     return t[:tl] if len(t) > tl else t 
 
-def get_word(sent_pct):
+def get_word(statsdict):
     """returns the approrpiate list of words, and colors for a sentiment between 0 (bad) and 1 (good)."""
-    if sent_pct > 0.8:
-        return ["terrific", "awesome", "amazing", "fabulous" ], "#67FF00"
-    elif sent_pct > 0.6:
-        return ["rad", "good", "sweet", "great"], "#67FF00"
-    elif sent_pct > 0.4:
-        return ["so so", "alright", "okay"], "#000000"
-    elif sent_pct > 0.2:
-        return [ "poor", "icky", "smelly" ], "FF0083"
-    else:
-        return ["terrible", "awful", "bad" ], "FF0083"
+    diff = statsdict['pct_pos'] - statsdict['pct_neg']
+    if abs(diff) <= 10: # neither is significantly larger
+        return ["so so", "alright", "okay", "meh"], "" # empty string keeps font color the same
+    if diff < 0: # effectively < -10 (sad)
+        if diff < -20: # really bad
+            return ["terrible", "awful", "bad" ], "FF0083"
+        else:
+            return [ "poor", "icky", "smelly" ], "FF0083"
+        
+    else: # effectively diff > 10 (happy)
+        if diff > 20: # really good
+            return ["terrific", "awesome", "amazing", "fabulous" ], "#67FF00"
+        else: 
+            return ["rad", "good", "sweet", "great"], "#67FF00"
 
 @app.route('/')
 def search_page():
@@ -38,17 +42,21 @@ def about():
 @app.route('/search/<term>')
 def sbp(term):
     term = urllib.unquote(term)
-    pos, neg, top_pos, top_neg = ts.search_get_sentiment(term, auth)
+    pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
 
     stats = dict()
     stats['pos'] = len(pos)
     stats['neg'] = len(neg)
+    stats['neu'] = len(neu)
+    stats['sum'] = stats['pos'] + stats['neg'] + stats['neu']
     stats['top_pos'] = len(top_pos)
     stats['top_neg'] = len(top_neg)
-    stats['pct_pos'] = int(100.0*stats['pos']/float(stats['pos'] + stats['neg']))
-    stats['pct_neg'] = 100 - stats['pct_pos']
+    stats['pct_pos'] = int(100.0*stats['pos']/float(stats['sum']))
+    stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
+    stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
 
-    words, color = get_word(stats['pct_pos']/100.0)
+    print stats
+    words, color = get_word(stats)
 
     # trim top tweets down.  pos/neg are sorted by sentiment
     tweet_limit = 8
