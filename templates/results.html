@@ -15,9 +15,14 @@
 		<div class="row-fluid">
 			<!-- Positive Tweets! -->
 			<div class="span5">
-				<h3> Positive Tweets </h3>
+				<h3> <center> Positive Tweets </center></h3>
 				{% for tweet in pos %}
-				<p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p>
+				<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
+				<blockquote class="twitter-tweet">
+					<p>{{ tweet['text'] }}</p>&mdash;
+					{{tweet['from_user_name']}} (@{{tweet['from_user']}})
+					<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
+				</blockquote>
 				{% endfor %}
 				<div id="positive" style="width: 350px; height: 350px;"> <!-- Div for Word Cloud--> </div>
 			</div>
@@ -33,13 +38,21 @@
 
 			<!-- Negative Tweets! -->
 			<div class="span5">
-				<h3> Negative Tweets </h3>
+				<h3> <center> Negative Tweets </center> </h3>
 				{% for tweet in neg %}
-				<p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p>
+				<blockquote class="twitter-tweet">
+					<p>{{ tweet['text'] }}</p>&mdash;
+					{{tweet['from_user_name']}} (@{{tweet['from_user']}})
+					<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
+				</blockquote>
+
+				<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
 				{% endfor %}
 				<div id="negative" style="width: 350px; height: 350px;"> <!-- Div for Word Cloud--> </div>
 			</div>
 		</div>
+		<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
 		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
 		<script type="text/javascript" src="/static/jqcloud-1.0.2.min.js"></script>
 		<script>

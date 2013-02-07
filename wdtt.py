@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 import twittersentiment as ts
 import random
 import urllib
+from dateutil.parser import parse
 
 app = Flask(__name__)
 #app.config.from_object = (__name__)
@@ -60,13 +61,13 @@ def sbp(term):
 
     # trim top tweets down.  pos/neg are sorted by sentiment
     tweet_limit = 8
-    # print "pos before", len(pos)
+
     pos = trim_tweets(pos, tweet_limit)
     neg = trim_tweets(neg, tweet_limit)
-    # print "pos after", len(pos)
-    p = [ (t['from_user'], t['text']) for t in pos]
-    n = [ (t['from_user'], t['text']) for t in neg]
 
+    for i, t in enumerate(pos):
+        pos[i]['formatted_date'] = parse(t['created_at']).strftime("%B %d %Y")
+        
     top_pos = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_pos ]
     top_neg = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_neg ]
 
