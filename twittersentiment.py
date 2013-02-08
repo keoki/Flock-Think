@@ -110,7 +110,7 @@ def get_raw_sentiment_sk(tweets):
     r = []
     for i, v in enumerate(result):
         r.append( (v[1], v[0], tweets[i]))
-        print v[1], v[0], tweets[i]['text']
+        # print v[1], v[0], tweets[i]['text']
     # print r
     return r
 

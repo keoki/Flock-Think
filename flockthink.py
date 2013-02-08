@@ -57,7 +57,7 @@ def sbp(term):
     stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
     stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
 
-    print stats
+    # print stats
     words, color = get_word(stats)
 
     # trim top tweets down.  pos/neg are sorted by sentiment
