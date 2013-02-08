@@ -153,7 +153,7 @@ def sort_by_sentiment(tweets):
 
     return pos, neu, neg
 
-def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=5, remove_words_shorter_than=3):
+def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=3, remove_words_shorter_than=3):
     """get top words from tweet list.  Filter_term is used to remove terms from list (ie: search terms)
     cutoff - # of occurrences in order to call it good.
     filter_common = remove common words
