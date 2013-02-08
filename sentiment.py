@@ -6,19 +6,21 @@ from nltk.collocations import BigramCollocationFinder
 from nltk.metrics import BigramAssocMeasures
 from nltk.classify import NaiveBayesClassifier, MaxentClassifier
 #from nltk.classify.util import accuracy
+stemmer = PorterStemmer()
+tokenizer = WordPunctTokenizer()
 
-def extract_words(text):
+def extract_words(text, filter_bigrams=None):
     """Extract word tokens from a text.
+    filter_bigrams - wether o not to filter bigrams.  Defaults to no.  If you have a large set of combined tweets for training, then it makes sense to set this to 3 (bigrams of >3 occurences are kept).
     """
-    stemmer = PorterStemmer()
-    tokenizer = WordPunctTokenizer()
     tokens = tokenizer.tokenize(text)
 
     bigram_finder = BigramCollocationFinder.from_words(tokens)
-    bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq, 500)
+    if filter_bigrams:
+        bigram_finder.apply_freq_filter(filter_bigrams)
+    bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq, 1000)
     for bigram_tuple in bigrams:
-        x = "%s %s" % bigram_tuple
-        tokens.append(x)
+        tokens.append("%s %s" % bigram_tuple)
     result =  [stemmer.stem(x.lower()) for x in tokens if x not in stopwords.words('english') and len(x) > 1]
     return result
 
