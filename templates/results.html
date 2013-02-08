@@ -5,25 +5,37 @@
 				font-size: 16pt;
 			}
 		  .row-fluid h1 {
-		  	font-size: 60pt;
+		  	font-size: 50pt;
 		  }
 		</style>
-
+		<br>
 		<div class="row-fluid">
-			<div class="span10">
+			<div class="span12">
 				<center> <h1>
-					"{{ text.term }}" is <font color="{{text.color}}">{{ text.text_result }}</font>
+					{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>
 				</h1></center>
 			</div>
+		</div>
+		<br><br>
+		<div class="row-fluid">
+			<div class="span5">
+				<h3> <center> The Good </center></h3>
+				<div id="positive" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
+			</div>
 			<div class="span2">
-				<center> <div id="chart"> <!-- Chart --> </div> </center>
+				<!-- <br>
+				<br> -->
+				<center> <div id="chart" style="margin-top: 100px;"> <!-- Chart --> </div> </center>
+			</div>
+			<div class="span5">
+				<h3> <center> The Bad </center> </h3>
+				<div id="negative" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
 			</div>
 		</div>
 
 		<div class="row-fluid">
 			<!-- Positive Tweets! -->
 			<div class="span6">
-				<h3> <center> Positive Tweets </center></h3>
 				{% for tweet in pos %}
 				<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
 				<blockquote class="twitter-tweet">
@@ -32,7 +44,6 @@
 					<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
 				</blockquote>
 				{% endfor %}
-				<div id="positive" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
 			</div>
 
 			<!-- Statistics -->
@@ -42,7 +53,6 @@
 
 			<!-- Negative Tweets! -->
 			<div class="span6">
-				<h3> <center> Negative Tweets </center> </h3>
 				{% for tweet in neg %}
 				<blockquote class="twitter-tweet">
 					<p>{{ tweet['text'] }}</p>&mdash;
@@ -52,7 +62,6 @@
 
 				<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
 				{% endfor %}
-				<div id="negative" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
 			</div>
 		</div>
 		<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -86,9 +95,9 @@
 		<script src="http://d3js.org/d3.v3.min.js"></script>
     <script type="text/javascript">
  
-    var w = 100,                        //width
-    h = 100,                            //height
-    r = 48,                            //radius
+    var w = 170,                        //width
+    h = 170,                            //height
+    r = 85,                            //radius
     color = d3.scale.category10();     //builtin range of colors
  
 		data = [{"label":":)", "value": {{stats.pct_pos}}}, 
