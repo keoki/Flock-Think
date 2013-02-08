@@ -11,7 +11,7 @@ app = Flask(__name__)
 #app.config.from_object = (__name__)
 auth = ts.authenticate()
 
-title = "What does Twitter think?"
+title = "FlockThink"
 
 def trim_tweets(t, tl = 8):
     return t[:tl] if len(t) > tl else t 
