@@ -1,5 +1,4 @@
 import twitter
-from senti_classifier import senti_classifier as sc
 import sentiment
 import pickle
 import nltk
