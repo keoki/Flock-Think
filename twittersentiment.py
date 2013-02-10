@@ -3,6 +3,7 @@ import sentiment
 import pickle
 import nltk
 from nltk.corpus import stopwords
+import MySQLdb as mysqldb
 
 cl = "model.pickle" # currently a bayes classifier from 04-classifier2.py
 try:
@@ -15,6 +16,9 @@ stopwords = stopwords.words("english")
 # stopwords.append("via")
 # stopwords.append("rt")
 # stopwords.append("RT")
+
+conn = mysqldb.connect(unix_socket="/tmp/mysql.sock", user="flask", passwd="m-Zbonkp5NXZHqZS nCAw5oXS8RR6aqzjDP3tiCg5cYPR36MK_z3u QvFMB8M4uY", db="insight")
+# cur = conn.cursor()
 
 def authenticate():
     OAUTH_TOKEN="167133966-EnnTYkbphBbmwo9FFd2hwv5JSkOaNSRSBsh4LzY"
@@ -51,6 +55,27 @@ def search_tweets(term, auth=None, result_type="recent", limit=300, lang='en'):
                     lang = lang,
                     include_entities = 'true')['results'])
     return result
+
+def insert(query_with_sent, tweets_with_sent):
+    """ Insert a query and sentiment information into the database.
+    tweets_with_sent is a list of tweet objects, with tweet['sentiment_score'] as the sentiment score (this is set in sort_by_sentiment()).
+    query_with_sent is a dictionary of the search term along with the number of positive/negative/neutral tweets.
+    """
+    sql = """INSERT INTO querylogs (search_term, time, num_pos, num_neg, num_neu)
+		VALUES("{term}", NOW(), {pos}, {neg}, {neu});
+    set @KEY = LAST_INSERT_ID();
+    INSERT INTO tweets (query_id, tweet_id, twitter_id, sentiment) VALUES 
+    """.format(**query_with_sent)
+    for tweet in tweets_with_sent:
+        sql += "(@KEY, {id}, {from_user_id}, {sentiment_score}),\n".format(**tweet)
+
+    sql = sql[:-2] + ';\n'
+
+    cur = conn.cursor()
+    cur.execute(sql)
+    cur.close()
+    conn.commit()
+    return
 
 def remove_tweets(tweets, remove_rt = True ):
     """ filter tweets on criteria. Right now it just removes Retweets.

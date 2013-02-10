@@ -58,6 +58,8 @@ def sbp(term):
     stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
     stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
 
+    ts.insert(stats, pos+neg+neu)
+    
     # print stats
     words, color = get_word(stats)
 
