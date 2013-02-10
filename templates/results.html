@@ -1,145 +1,148 @@
-		{% extends "layout.html" %}
-		{% block content %}
-		<style type="text/css">
-			.slice text {
-				font-size: 16pt;
-			}
-		  .row-fluid h1 {
-		  	font-size: 50pt;
-		  }
-		</style>
-		<br>
-		<div class="row-fluid">
-			<div class="span12">
-				<center> <h1>
-					{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>
-				</h1></center>
-			</div>
-		</div>
-		<br><br>
-		<div class="row-fluid">
-			<div class="span5">
-				<h3> <center> The Good </center></h3>
-				<div id="positive" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
-			</div>
-			<div class="span2">
-				<!-- <br>
-				<br> -->
-				<center> <div id="chart" style="margin-top: 100px;"> <!-- Chart --> </div> </center>
-			</div>
-			<div class="span5">
-				<h3> <center> The Bad </center> </h3>
-				<div id="negative" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
-			</div>
-		</div>
+{% extends "layout.html" %}
+{% block content %}
+<style type="text/css">
+	.slice text {
+		font-size: 16pt;
+	}
+  .row-fluid h1 {
+  	font-size: 50pt;
+  }
+</style>
+<br>
+<div class="row-fluid">
+	<div class="span12">
+		<center> <h1>
+			{{ text.term }} is <font color="{{text.color}}">{{ text.text_result }}</font>
+		</h1></center>
+	</div>
+</div>
+<br><br>
+<div class="row-fluid">
+	<div class="span5">
+		<h3> <center> The Good </center></h3>
+		<div id="positive" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
+	</div>
+	<div class="span2">
+		<!-- <br>
+		<br> -->
+		<center> <div id="chart" style="margin-top: 100px;"> <!-- Chart --> </div> </center>
+	</div>
+	<div class="span5">
+		<h3> <center> The Bad </center> </h3>
+		<div id="negative" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
+	</div>
+</div>
 
-		<div class="row-fluid">
-			<!-- Positive Tweets! -->
-			<div class="span6">
-				{% for tweet in pos %}
-				<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
-				<blockquote class="twitter-tweet">
-					<p>{{ tweet['text'] }}</p>&mdash;
-					{{tweet['from_user_name']}} (@{{tweet['from_user']}})
-					<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
-				</blockquote>
-				{% endfor %}
-			</div>
+<hr class="featurette-divider">
 
-			<!-- Statistics -->
-			<!-- <div class="span2">
-				<center> <div id="chart"> </div> </center>
-			</div> -->
+<div class="row-fluid">
+	<!-- Positive Tweets! -->
+	<div class="span6">
+		{% for tweet in pos %}
+		<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
+		<blockquote class="twitter-tweet">
+			<p>{{ tweet['text'] }}</p>&mdash;
+			{{tweet['from_user_name']}} (@{{tweet['from_user']}})
+			<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
+		</blockquote>
+		{% endfor %}
+	</div>
 
-			<!-- Negative Tweets! -->
-			<div class="span6">
-				{% for tweet in neg %}
-				<blockquote class="twitter-tweet">
-					<p>{{ tweet['text'] }}</p>&mdash;
-					{{tweet['from_user_name']}} (@{{tweet['from_user']}})
-					<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
-				</blockquote>
+	<!-- Statistics -->
+	<!-- <div class="span2">
+		<center> <div id="chart"> </div> </center>
+	</div> -->
 
-				<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
-				{% endfor %}
-			</div>
-		</div>
-		<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+	<!-- Negative Tweets! -->
+	<div class="span6">
+		{% for tweet in neg %}
+		<blockquote class="twitter-tweet">
+			<p>{{ tweet['text'] }}</p>&mdash;
+			{{tweet['from_user_name']}} (@{{tweet['from_user']}})
+			<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
+		</blockquote>
 
-		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
-		<script type="text/javascript" src="/static/jqcloud-1.0.2.min.js"></script>
-		<script>
-		var pos_word_array = [
-		{% for word, formatted, score in pos_words %}
-		{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
-		{%endfor%}
-		];
+		<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
+		{% endfor %}
+	</div>
+</div>
+
+<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="/static/jqcloud-1.0.2.min.js"></script>
+<script>
+var pos_word_array = [
+{% for word, formatted, score in pos_words %}
+{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
+{%endfor%}
+];
 	
-		$(function() { 
-			$("#positive")
-			.jQCloud(pos_word_array);
-		});
+$(function() { 
+	$("#positive")
+	.jQCloud(pos_word_array);
+});
 
-		var neg_word_array = [
-		{% for word, formatted, score in neg_words %}
-		{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
-		{%endfor%}
-		];
+var neg_word_array = [
+{% for word, formatted, score in neg_words %}
+{ text: "{{ word }}", weight: "{{score}}", link: "/search/{{formatted}}" },
+{%endfor%}
+];
 	
-		$(function() { 
-			$("#negative")
-			.jQCloud(neg_word_array);
-		});
-		</script>
+$(function() { 
+	$("#negative")
+	.jQCloud(neg_word_array);
+});
+</script>
 
-		<script src="http://d3js.org/d3.v3.min.js"></script>
-    <script type="text/javascript">
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript">
  
-    var w = 170,                        //width
-    h = 170,                            //height
-    r = 85,                            //radius
-    color = d3.scale.category10();     //builtin range of colors
+var w = 170,                        //width
+h = 170,                            //height
+r = 85,                            //radius
+color = d3.scale.category10();     //builtin range of colors
  
-		data = [{"label":":)", "value": {{stats.pct_pos}}}, 
-		        {"label":":(", "value": {{stats.pct_neg}}},
-		        {"label":":|", "value": {{stats.pct_neu}}},
+data = [{"label":":)", "value": {{stats.pct_pos}}}, 
+        {"label":":(", "value": {{stats.pct_neg}}},
+        {"label":":|", "value": {{stats.pct_neu}}},
 						
-						];
+				];
     
-    var vis = d3.select("#chart")
-        .append("svg:svg")              //create the SVG element inside the <body>
-        .data([data])                   //associate our data with the document
-            .attr("width", w)           //set the width and height of our visualization (these will be attributes of the <svg> tag
-            .attr("height", h)
-        .append("svg:g")                //make a group to hold our pie chart
-            .attr("transform", "translate(" + r + "," + r + ")")    //move the center of the pie chart from 0, 0 to radius, radius
+var vis = d3.select("#chart")
+    .append("svg:svg")              //create the SVG element inside the <body>
+    .data([data])                   //associate our data with the document
+        .attr("width", w)           //set the width and height of our visualization (these will be attributes of the <svg> tag
+        .attr("height", h)
+    .append("svg:g")                //make a group to hold our pie chart
+        .attr("transform", "translate(" + r + "," + r + ")")    //move the center of the pie chart from 0, 0 to radius, radius
  
-    var arc = d3.svg.arc()              //this will create <path> elements for us using arc data
-        .outerRadius(r);
+var arc = d3.svg.arc()              //this will create <path> elements for us using arc data
+    .outerRadius(r);
  
-    var pie = d3.layout.pie()           //this will create arc data for us given a list of values
-        .value(function(d) { return d.value; });    //we must tell it out to access the value of each element in our data array
+var pie = d3.layout.pie()           //this will create arc data for us given a list of values
+    .value(function(d) { return d.value; });    //we must tell it out to access the value of each element in our data array
  
-    var arcs = vis.selectAll("g.slice")     //this selects all <g> elements with class slice (there aren't any yet)
-        .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties) 
-        .enter()                            //this will create <g> elements for every "extra" data element that should be associated with a selection. The result is creating a <g> for every object in the data array
-            .append("svg:g")                //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
-                .attr("class", "slice");    //allow us to style things in the slices (like text)
+var arcs = vis.selectAll("g.slice")     //this selects all <g> elements with class slice (there aren't any yet)
+    .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties) 
+    .enter()                            //this will create <g> elements for every "extra" data element that should be associated with a selection. The result is creating a <g> for every object in the data array
+        .append("svg:g")                //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
+            .attr("class", "slice");    //allow us to style things in the slices (like text)
  
-        arcs.append("svg:path")
-                .attr("fill", function(d, i) { return color(i); } ) //set the color for each slice to be chosen from the color function defined above
-                .attr("d", arc);                                    //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+    arcs.append("svg:path")
+            .attr("fill", function(d, i) { return color(i); } ) //set the color for each slice to be chosen from the color function defined above
+            .attr("d", arc);                                    //this creates the actual SVG path using the associated data (pie) with the arc drawing function
  
-        arcs.append("svg:text")                                     //add a label to each slice
-                .attr("transform", function(d) {                    //set the label's origin to the center of the arc
-                //we have to make sure to set these before calling arc.centroid
-                d.innerRadius = 0;
-                d.outerRadius = r;
-                return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
-            })
-            .attr("text-anchor", "middle")                          //center the text on it's origin
-            .text(function(d, i) { return data[i].label; });        //get the label from our original data array
+    arcs.append("svg:text")                                     //add a label to each slice
+            .attr("transform", function(d) {                    //set the label's origin to the center of the arc
+            //we have to make sure to set these before calling arc.centroid
+            d.innerRadius = 0;
+            d.outerRadius = r;
+            return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+        })
+        .attr("text-anchor", "middle")                          //center the text on it's origin
+        .text(function(d, i) { return data[i].label; });        //get the label from our original data array
         
-    </script>
+</script>
 
-		{% endblock %}
+{% endblock %}
