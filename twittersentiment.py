@@ -1,5 +1,4 @@
 import twitter
-import sentiment
 import pickle
 import nltk
 from nltk.corpus import stopwords
