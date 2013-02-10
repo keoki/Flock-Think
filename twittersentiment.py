@@ -17,7 +17,7 @@ stopwords = stopwords.words("english")
 # stopwords.append("rt")
 # stopwords.append("RT")
 
-conn = mysqldb.connect(unix_socket="/tmp/mysql.sock", user="flask", passwd="m-Zbonkp5NXZHqZS nCAw5oXS8RR6aqzjDP3tiCg5cYPR36MK_z3u QvFMB8M4uY", db="insight")
+conn = mysqldb.connect(user="flask", passwd="m-Zbonkp5NXZHqZS nCAw5oXS8RR6aqzjDP3tiCg5cYPR36MK_z3u QvFMB8M4uY", db="insight")
 # cur = conn.cursor()
 
 def authenticate():
