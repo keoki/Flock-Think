@@ -43,7 +43,7 @@ def about():
 
 @app.route('/search/<term>')
 def sbp(term):
-    term = urllib.unquote(term)
+    term = (urllib.unquote(term)).strip()
     pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
 
     stats = dict()
@@ -85,5 +85,5 @@ def search():
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.debug = True
+    # app.debug = True
     app.run(host='0.0.0.0', port=port)
