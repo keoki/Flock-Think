@@ -68,39 +68,6 @@ def remove_tweets(tweets, remove_rt = True ):
     return tweets
 
 def get_raw_sentiment(tweets):
-    return get_raw_sentiment_sk(tweets)
-
-def get_raw_sentiment_orig(tweets):
-    """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
-    Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
-    """
-    v = []
-    for t in tweets:
-        tokens = bag_of_words(t['text'].split())
-
-        probs = classifier.prob_classify(tokens)
-        pos, neg = probs.prob("pos"), probs.prob("neg")
-        v.append( (pos, neg, t) )
-
-    return v
-
-def get_raw_sentiment_new(tweets):
-    """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
-    Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
-    """
-    v = []
-    for t in tweets:
-        features = sentiment.extract_words(t['text'])
-        v.append( dict(zip(features, map(lambda a: True, features))) )
-    result = classifier.batch_prob_classify(v)
-    # print "result", result
-    r = []
-    # bug here: v is enumerated and set.  fix
-    for i, v in enumerate(v):
-        r.append( (result[i].prob("pos"), result[i].prob("neg"), tweets[i])) 
-    return r
-
-def get_raw_sentiment_sk(tweets):
     """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
     Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
     """
@@ -113,22 +80,6 @@ def get_raw_sentiment_sk(tweets):
         # print v[1], v[0], tweets[i]['text']
     # print r
     return r
-
-def sort_by_sentiment(tweets):
-    """ Sorts tweets by sentiment.
-    """
-    threshold = 0.5
-    st = get_raw_sentiment(tweets)
-
-    # rank the elements by score happy to sad.
-    st.sort(reverse=True)
-    pos = list()
-    neg = list()
-    [pos.append(t) if p > threshold else neg.append(t) for (p, n, t) in st]
-    # reversing the negative ones puts the saddest at the top
-    neg.reverse()
-
-    return pos, neg
     
 def sort_by_sentiment(tweets):
     """ Sorts tweets by sentiment.
@@ -141,6 +92,7 @@ def sort_by_sentiment(tweets):
     neu = []
     neg = []
     for (p, n, t) in st:
+        t['sentiment_score'] = p # this is added so insert() can see the score
         if p > 0.66:
             pos.append(t)
         elif p > 0.33:
@@ -174,9 +126,6 @@ def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=3, remove_
             if keyword != filter_term:
                 cutoff_combined.append((keyword, count))
     return cutoff_combined
-
-def bag_of_words(words):
-    return dict([(word, True) for word in words])
 
 def norm_words(words, lower=True, remove_punctuation = True, remove_http = True):
     """normalize words by converting to lower case and removing punctuation. Works on both lists of words and a single string, but it's recommenede that this be used on a single string rather than lists of words since norm_words can make some strings empty and it does not remove them.
@@ -226,7 +175,7 @@ def search_get_raw_sentiment(term, auth=None):
 def search_get_sentiment(term, auth=None):
     raw = search_tweets(term, auth=auth)
     filtered = remove_tweets(raw)
-    pos,neu, neg = sort_by_sentiment(filtered)
+    pos, neu, neg = sort_by_sentiment(filtered)
 
     top_pos = get_top(pos, filter_term=term.lower())
     top_neg = get_top(neg, filter_term=term.lower())

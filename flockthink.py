@@ -29,7 +29,7 @@ def get_word(statsdict):
         
     else: # effectively diff > 10 (happy)
         if diff > 20: # really good
-            return ["terrific", "awesome", "amazing", "fabulous" ], "#67FF00"
+            return ["terrific", "awesome", "amazing", "fabulous", "phenomenal" ], "#67FF00"
         else: 
             return ["rad", "good", "sweet", "great"], "#67FF00"
 
@@ -47,6 +47,7 @@ def sbp(term):
     pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
 
     stats = dict()
+    stats['term'] = term
     stats['pos'] = len(pos)
     stats['neg'] = len(neg)
     stats['neu'] = len(neu)
