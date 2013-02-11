@@ -42,9 +42,13 @@ def about():
     return render_template("about.html")
 
 @app.route('/search/<term>')
-def sbp(term):
+def search_term(term):
     term = (urllib.unquote(term)).strip()
-    pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
+    try:
+        pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
+    except ts.twitter.TwitterHTTPError:
+        # Twitter Error!
+        return render_template("error.html", term=term)
 
     stats = dict()
     stats['term'] = term
@@ -84,7 +88,7 @@ def sbp(term):
 
 @app.route('/search', methods=['POST'])
 def search():
-    return redirect(url_for('sbp', term=request.form['search_text']))
+    return redirect(url_for('search_term', term=request.form['search_text']))
 
 if __name__ == "__main__":
     # app.debug = True
