@@ -17,7 +17,6 @@ stopwords = stopwords.words("english")
 # stopwords.append("RT")
 
 conn = mysqldb.connect(user="flask", passwd="m-Zbonkp5NXZHqZS nCAw5oXS8RR6aqzjDP3tiCg5cYPR36MK_z3u QvFMB8M4uY", db="insight")
-# cur = conn.cursor()
 
 def authenticate():
     OAUTH_TOKEN="167133966-EnnTYkbphBbmwo9FFd2hwv5JSkOaNSRSBsh4LzY"
@@ -60,6 +59,7 @@ def insert(query_with_sent, tweets_with_sent):
     tweets_with_sent is a list of tweet objects, with tweet['sentiment_score'] as the sentiment score (this is set in sort_by_sentiment()).
     query_with_sent is a dictionary of the search term along with the number of positive/negative/neutral tweets.
     """
+    query_with_sent['term'] = conn.escape_string(query_with_sent['term'])
     sql = """INSERT INTO querylogs (search_term, time, num_pos, num_neg, num_neu)
 		VALUES("{term}", NOW(), {pos}, {neg}, {neu});
     set @KEY = LAST_INSERT_ID();
