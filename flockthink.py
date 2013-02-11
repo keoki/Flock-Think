@@ -88,6 +88,7 @@ def search():
 
 if __name__ == "__main__":
     # app.debug = True
+    import logging
     file_handler = logging.FileHandler(os.path.expanduser("~/flask.log"))
     file_handler.setLevel(logging.WARNING)
     app.logger.addHandler(file_handler)
