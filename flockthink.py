@@ -87,20 +87,10 @@ def search():
     return redirect(url_for('sbp', term=request.form['search_text']))
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
     # app.debug = True
-    app.run(host='0.0.0.0', port=port)
-    ADMINS = ['keokis+flockthink@gmail.com']
-    if not app.debug:
-        import logging
-        from logging.handlers import SMTPHandler
-        mail_handler = SMTPHandler('127.0.0.1',
-                               'server-error@example.com',
-                               ADMINS, 'YourApplication Failed')
-        mail_handler.setLevel(logging.ERROR)
-        app.logger.addHandler(mail_handler)
+    file_handler = logging.FileHandler(os.path.expanduser("~/flask.log"))
+    file_handler.setLevel(logging.WARNING)
+    app.logger.addHandler(file_handler)
 
-        file_handler = logging.FileHandler("%s/flask.log" % os.path.expanduser("~"))
-        file_handler.setLevel(logging.WARNING)
-        app.logger.addHandler(file_handler)
-    
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
