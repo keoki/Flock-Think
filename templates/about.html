@@ -1,9 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
-<a href="/">FlockThink</a> is designed by Keoki Seu runs on Python with
-Twitter Bootstrap. The sentiment analysis code is written in Python and uses the
-scikit-learn toolkit. The training set was collected over a couple of
-days from the twitter stream.  The sentiment of the training set was determined
-by the presence of emoticons.
-
+<br>
+<div class="row-fluid">
+	<div class="span8 offset2">
+		<p>
+			<a href="/">FlockThink</a> is a project by <a href="http://twitter.com/KeokiSeu">Keoki Seu</a>.
+			The sentiment analysis is written in Python and uses the scikit-learn toolkit.
+			The training set was collected from the Twitter stream over a couple of weeks, with the presence of emoticons to indicate positive or negative sentiment.
+		</p>
+		<p>
+			To process the training set, usernames and urls are replaced with generic tokens.
+			Tweets less than four words or ones that have less than 75% english words are removed.
+			A scikit-pipeline is formed that considers bigram and trigram word fragments before being fedd to a multinominal Naive Bayes algorithm.
+			Currently, the accuracy of the algorithm is 79%.
+		</p>
+		<p>
+			The website is built using Twitter Bootstrap and Flask, and D3.js is used for visualization.
+		</p>
+	</div>
+</div>
 {% endblock %}
