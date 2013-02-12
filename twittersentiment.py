@@ -59,15 +59,17 @@ def insert(query_with_sent, tweets_with_sent):
     tweets_with_sent is a list of tweet objects, with tweet['sentiment_score'] as the sentiment score (this is set in sort_by_sentiment()).
     query_with_sent is a dictionary of the search term along with the number of positive/negative/neutral tweets.
     """
+    # Quote out search term.  This is the only input from the user so it's the only thing that needs to be quoted out.
     query_with_sent['term'] = conn.escape_string(query_with_sent['term'])
+
     sql = """INSERT INTO querylogs (search_term, time, num_pos, num_neg, num_neu)
 		VALUES("{term}", NOW(), {pos}, {neg}, {neu});
     set @KEY = LAST_INSERT_ID();
     INSERT INTO tweets (query_id, tweet_id, twitter_id, sentiment) VALUES 
     """.format(**query_with_sent)
+
     for tweet in tweets_with_sent:
         sql += "(@KEY, {id}, {from_user_id}, {sentiment_score}),\n".format(**tweet)
-
     sql = sql[:-2] + ';\n'
 
     cur = conn.cursor()
