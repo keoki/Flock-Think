@@ -102,11 +102,11 @@ var w = 170,                        //width
 h = 170,                            //height
 r = 85,                            //radius
 color = d3.scale.category10();     //builtin range of colors
- 
+color = d3.scale.quantile().domain([0,1,2]).range(["#ABFF83", "#FCB2AE", "#C9CCFC"])
+
 data = [{"label":":)", "value": {{stats.pct_pos}}}, 
         {"label":":(", "value": {{stats.pct_neg}}},
-        {"label":":|", "value": {{stats.pct_neu}}},
-						
+        {"label":":|", "value": {{stats.pct_neu}}},	
 				];
     
 var vis = d3.select("#chart")

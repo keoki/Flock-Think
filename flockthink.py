@@ -20,18 +20,18 @@ def get_word(statsdict):
     """returns the approrpiate list of words, and colors for a sentiment between 0 (bad) and 1 (good)."""
     diff = statsdict['pct_pos'] - statsdict['pct_neg']
     if abs(diff) <= 10: # neither is significantly larger
-        return ["so so", "alright", "okay", "meh"], "" # empty string keeps font color the same
+        return ["so so", "alright", "okay", "meh"], "C9CCFC" # empty string keeps font color the same
     if diff < 0: # effectively < -10 (sad)
         if diff < -20: # really bad
-            return ["terrible", "awful", "bad" ], "FF0083"
+            return ["terrible", "awful", "bad" ], "FCB2AE"
         else:
-            return [ "poor", "icky", "smelly" ], "FF0083"
+            return [ "poor", "icky", "smelly" ], "FCB2AE"
         
     else: # effectively diff > 10 (happy)
         if diff > 20: # really good
-            return ["terrific", "awesome", "amazing", "fabulous", "phenomenal" ], "#67FF00"
+            return ["terrific", "awesome", "amazing", "fabulous", "phenomenal" ], "#ABFF83"
         else: 
-            return ["rad", "good", "sweet", "great"], "#67FF00"
+            return ["rad", "good", "sweet", "great"], "#ABFF83"
 
 @app.route('/')
 def search_page():
