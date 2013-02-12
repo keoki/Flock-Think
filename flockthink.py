@@ -62,7 +62,10 @@ def search_term(term):
     stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
     stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
 
-    ts.insert(stats, pos+neg+neu)
+    try:
+        ts.insert(stats, pos+neg+neu)
+    except:
+        app.logger.error("Could not insert into database. Query was %s." % term)
     
     # print stats
     words, color = get_word(stats)

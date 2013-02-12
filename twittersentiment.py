@@ -1,8 +1,12 @@
-import twitter
+import string
+import operator
+import re
 import pickle
+
+import twitter
+import MySQLdb as mysqldb
 import nltk
 from nltk.corpus import stopwords
-import MySQLdb as mysqldb
 
 cl = "model.pickle" # currently a bayes classifier from 04-classifier2.py
 try:
@@ -15,8 +19,6 @@ stopwords = stopwords.words("english")
 # stopwords.append("via")
 # stopwords.append("rt")
 # stopwords.append("RT")
-
-conn = mysqldb.connect(user="flask", passwd="m-Zbonkp5NXZHqZS nCAw5oXS8RR6aqzjDP3tiCg5cYPR36MK_z3u QvFMB8M4uY", db="insight")
 
 def authenticate():
     OAUTH_TOKEN="167133966-EnnTYkbphBbmwo9FFd2hwv5JSkOaNSRSBsh4LzY"
@@ -59,6 +61,8 @@ def insert(query_with_sent, tweets_with_sent):
     tweets_with_sent is a list of tweet objects, with tweet['sentiment_score'] as the sentiment score (this is set in sort_by_sentiment()).
     query_with_sent is a dictionary of the search term along with the number of positive/negative/neutral tweets.
     """
+    # this is not optimal but we're low traffic so make a new connection every function call
+    conn = mysqldb.connect(user="flask", passwd="m-Zbonkp5NXZHqZS nCAw5oXS8RR6aqzjDP3tiCg5cYPR36MK_z3u QvFMB8M4uY", db="insight")
     # Quote out search term.  This is the only input from the user so it's the only thing that needs to be quoted out.
     query_with_sent['term'] = conn.escape_string(query_with_sent['term'])
 
@@ -76,7 +80,8 @@ def insert(query_with_sent, tweets_with_sent):
     cur.execute(sql)
     cur.close()
     conn.commit()
-    return
+    conn.close()
+    return sql
 
 def remove_tweets(tweets, remove_rt = True ):
     """ filter tweets on criteria. Right now it just removes Retweets.
@@ -139,6 +144,10 @@ def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=3, remove_
     remove_words_shorter_than - remove words shorter than or equal to this value
     """
     combined_tweets = norm_words(" ".join([t['text'] for t in tweetlist]))
+    # remove the quotations from the filter_term.  Probably should make this more general but I cannot figure out string.translate()
+    # http://stackoverflow.com/questions/265960/best-way-to-strip-punctuation-from-a-string-in-python
+    filter_term = filter_term.replace("\"", "")
+    combined_tweets = combined_tweets.replace(filter_term, "")
     if filter_common:
         combined_tweets = filter(lambda w: not w in stopwords, combined_tweets.split())
     else:
@@ -156,7 +165,6 @@ def get_top(tweetlist, filter_term=None, filter_common = True, cutoff=3, remove_
 def norm_words(words, lower=True, remove_punctuation = True, remove_http = True):
     """normalize words by converting to lower case and removing punctuation. Works on both lists of words and a single string, but it's recommenede that this be used on a single string rather than lists of words since norm_words can make some strings empty and it does not remove them.
     """
-    import string, operator, re
 
     http_str = re.compile('htt[p|ps]://t.co/[a-zA-Z0-9\-\.]{8}')   
     # for now, keep the @ and # since they're special to twitter
