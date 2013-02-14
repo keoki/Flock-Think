@@ -19,23 +19,20 @@
 <br><br>
 <div class="row-fluid">
 	<div class="span5" style="text-align: center">
-		<h3>The Good</h3>
 		<div id="positive" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
 	</div>
 	<div class="span2" style="text-align: center">
 		<div id="chart" style="margin-top: 100px;"> <!-- Chart --> </div>
 	</div>
 	<div class="span5" style="text-align:center">
-		<h3>The Bad</h3>
 		<div id="negative" class="span6" style="width: 100%; height: 350px;"> <!-- Div for Word Cloud--> </div>
 	</div>
 </div>
 
-<hr class="featurette-divider">
-
 <div class="row-fluid">
 	<!-- Positive Tweets! -->
-	<div class="span6">
+	<div class="span6" style="text-align: center">
+		<h3>The Good</h3>
 		{% for tweet in pos %}
 		<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
 		<blockquote class="twitter-tweet">
@@ -47,7 +44,8 @@
 	</div>
 
 	<!-- Negative Tweets! -->
-	<div class="span6">
+	<div class="span6" style="text-align: center">
+		<h3>The Bad</h3>
 		{% for tweet in neg %}
 		<blockquote class="twitter-tweet">
 			<p>{{ tweet['text'] }}</p>&mdash;
