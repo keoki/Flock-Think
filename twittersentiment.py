@@ -83,10 +83,9 @@ def insert(query_with_sent, tweets_with_sent):
     conn.close()
     return sql
 
-def remove_tweets(tweets, remove_rt = True ):
-    """ filter tweets on criteria. Right now it just removes Retweets.
+def remove_tweets(tweets, remove_rt = True):
+    """ Remove tweets on criteria. Right now it just removes Retweets.
     """
-    import re
     if remove_rt:
         rt_regex = re.compile("RT|[Rr]etweet|RETWEET")
     else:
@@ -102,16 +101,47 @@ def get_raw_sentiment(tweets):
     """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
     Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
     """
-    t = [t['text'] for t in tweets]
+    # t = [t['text'] for t in tweets]
+    t = clean_tweets(tweets) # gives us a list of tweets that have been processed
+    
     result = classifier.predict_proba(t)
-    # print "result", result
     r = []
     for i, v in enumerate(result):
         r.append( (v[1], v[0], tweets[i]))
-        # print v[1], v[0], tweets[i]['text']
-    # print r
+
     return r
+
+# These are regexps for clean_tweets()
+t_username = re.compile('@([A-Za-z0-9_]+)')
+t_url = re.compile('htt[p|ps]://t.co/[a-zA-Z0-9\-\.]{8}')
+# from: http://stackoverflow.com/questions/4574509/python-remove-duplicate-chars-using-regex
+t_repeated = re.compile('([a-z])\1{3,25}')
+def clean_tweets(tweets):
+    """Clean tweets from twitter and remove the usernames, urls and repeated letters.
+    tweets is an iterable of tweet json objects
+    """
+    outlist = []
+    # from: Twitter Sentiment Classification using Distant Supervision
+    # 1: replace usernames with USERNAME
+    # 2: replace url with URL
+    # 3: replace repeated letters with two
     
+    for t in tweets:
+        # origtxt = t['text']
+        found_username = True if re.search(t_username, t['text']) else False
+        found_url = True if re.search(t_url, t['text']) else False
+        rtext = re.sub(t_username, "USERNAME",  t['text'])
+        # print rtext
+        rtext = re.sub(t_url, "URL", rtext)
+
+        # print rtext
+        rtext = re.sub(r'([a-z])\1{2,25}', r'\1\1', rtext)
+
+        # print "text!", rtext, t['text']
+        outlist.append( rtext )
+
+    return outlist
+
 def sort_by_sentiment(tweets):
     """ Sorts tweets by sentiment.
     """
