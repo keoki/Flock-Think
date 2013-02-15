@@ -13,6 +13,9 @@
 		<h1>Welcome to FlockThink</h1>
 		FlockThink is the Twitter search engine for instant sentiment analysis.
 		<br>
+		{% if term %}
+		<h4 class="text-error">No Twitter results for {{term}}.</h4>
+		{%endif%}
 		<br>
 		<form class="form-search search-query" action="/search" method="POST" >
 	  	<p><input type="text" name='search_text' placeholder='@sxsw, #iphone, goodreads' class="input-large search-query"> </p>

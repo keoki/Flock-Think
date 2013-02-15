@@ -47,6 +47,9 @@ def search_term(term):
     term = (urllib.unquote(term)).strip()
     try:
         pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
+        if len(pos) + len(neg) + len(neu) == 0:
+            return render_template("index.html", term=term)
+
     except ts.twitter.TwitterHTTPError:
         # Twitter Error!
         return render_template("error.html", term=term)
@@ -99,6 +102,10 @@ def api(term):
     
     try:
         pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
+        if len(pos) + len(neg) + len(neu) == 0:
+            stats['error'] = "No search results"
+            return json.dumps(stats)
+
     except ts.twitter.TwitterHTTPError:
         # Twitter Error!
         stats['error'] = "Could not connect to twitter"
@@ -111,8 +118,13 @@ def api(term):
     stats['pct_pos'] = int(100.0*stats['pos']/float(stats['sum']))
     stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
     stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
-    return json.dumps(stats)
 
+    try:
+        ts.insert(stats, pos+neg+neu)
+    except:
+        pass
+
+    return json.dumps(stats)
 
 @app.route('/search', methods=['POST'])
 def search():

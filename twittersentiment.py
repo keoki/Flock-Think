@@ -48,12 +48,16 @@ def search_tweets(term, auth=None, result_type="recent", limit=300, lang='en'):
 
     result = []
     for p in range(limit // fetchlimit):
-        result.extend( ts.search(q=term,
+        r = ts.search(q=term,
                     result_type="recent",
                     rpp=fetchlimit,
                     page=p+1,
                     lang = lang,
-                    include_entities = 'true')['results'])
+                    include_entities = 'true')
+        if len(r) == 0: # we have no results anymore. stop.
+            return result
+        result.extend( r['results'])
+
     return result
 
 def insert(query_with_sent, tweets_with_sent):
@@ -231,13 +235,11 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     # print words
     return words
 
-def search_get_raw_sentiment(term, auth=None):
-    tw = search_tweets(term, auth=auth)
-    tw = remove_tweets(tw, remove_rt=True)
-    return get_raw_sentiment(tw)
-
 def search_get_sentiment(term, auth=None):
     raw = search_tweets(term, auth=auth)
+    if len(raw) == 0: # No tweets :(
+        return [], [], [], [], []
+
     filtered = remove_tweets(raw)
     pos, neu, neg = sort_by_sentiment(filtered)
 
