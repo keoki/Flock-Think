@@ -57,11 +57,11 @@ def search_term(term):
     stats['neg'] = len(neg)
     stats['neu'] = len(neu)
     stats['sum'] = stats['pos'] + stats['neg'] + stats['neu']
-    stats['top_pos'] = len(top_pos)
-    stats['top_neg'] = len(top_neg)
     stats['pct_pos'] = int(100.0*stats['pos']/float(stats['sum']))
     stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
     stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
+    stats['top_pos'] = len(top_pos)
+    stats['top_neg'] = len(top_neg)
 
     try:
         ts.insert(stats, pos+neg+neu)
@@ -108,8 +108,6 @@ def api(term):
     stats['neg'] = len(neg)
     stats['neu'] = len(neu)
     stats['sum'] = stats['pos'] + stats['neg'] + stats['neu']
-    stats['top_pos'] = len(top_pos)
-    stats['top_neg'] = len(top_neg)
     stats['pct_pos'] = int(100.0*stats['pos']/float(stats['sum']))
     stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
     stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
