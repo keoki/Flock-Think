@@ -4,6 +4,7 @@ from dateutil.parser import parse
 import urllib
 
 from flask import Flask, request, redirect, url_for, render_template
+import json
 
 import twittersentiment as ts
 
@@ -88,6 +89,32 @@ def search_term(term):
     text['color'] = color
 
     return render_template("results.html", pos=pos, pos_words=top_pos, neg=neg, neg_words=top_neg, stats=stats, text=text)
+
+@app.route('/api/<term>')
+def api(term):
+    term = (urllib.unquote(term)).strip()
+
+    stats = dict()
+    stats['term'] = term
+    
+    try:
+        pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
+    except ts.twitter.TwitterHTTPError:
+        # Twitter Error!
+        stats['error'] = "Could not connect to twitter"
+        return json.dumps(stats)
+
+    stats['pos'] = len(pos)
+    stats['neg'] = len(neg)
+    stats['neu'] = len(neu)
+    stats['sum'] = stats['pos'] + stats['neg'] + stats['neu']
+    stats['top_pos'] = len(top_pos)
+    stats['top_neg'] = len(top_neg)
+    stats['pct_pos'] = int(100.0*stats['pos']/float(stats['sum']))
+    stats['pct_neu'] = int(100.0*stats['neu']/float(stats['sum']))
+    stats['pct_neg'] = int(100.0*stats['neg']/float(stats['sum']))
+    return json.dumps(stats)
+
 
 @app.route('/search', methods=['POST'])
 def search():
