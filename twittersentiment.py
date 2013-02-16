@@ -1,5 +1,4 @@
 import string
-import operator
 import re
 import pickle
 
@@ -132,8 +131,8 @@ def clean_tweets(tweets):
     
     for t in tweets:
         # origtxt = t['text']
-        found_username = True if re.search(t_username, t['text']) else False
-        found_url = True if re.search(t_url, t['text']) else False
+        # found_username = True if re.search(t_username, t['text']) else False
+        # found_url = True if re.search(t_url, t['text']) else False
         rtext = re.sub(t_username, "USERNAME",  t['text'])
         # print rtext
         rtext = re.sub(t_url, "URL", rtext)
@@ -149,7 +148,6 @@ def clean_tweets(tweets):
 def sort_by_sentiment(tweets):
     """ Sorts tweets by sentiment.
     """
-    threshold = 0.5
     st = get_raw_sentiment(tweets)
 
     st.sort(reverse=True)
