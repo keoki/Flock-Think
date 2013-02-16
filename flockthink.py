@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import random
 from dateutil.parser import parse
@@ -44,7 +45,7 @@ def about():
 
 @app.route('/search/<term>')
 def search_term(term):
-    term = (urllib.unquote(term)).strip()
+    term = (urllib.unquote(term)).strip() # remove whitespace on edges
     try:
         pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
         if len(pos) + len(neg) + len(neu) == 0:
