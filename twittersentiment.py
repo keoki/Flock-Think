@@ -1,6 +1,9 @@
 import string
 import re
 import pickle
+from Queue import Queue
+import threading
+import time
 
 import twitter
 import MySQLdb as mysqldb
@@ -26,7 +29,63 @@ def authenticate():
     CONSUMER_SECRET = "I0EVikHnnGU6wAzL7gl1nNuejIu2YuUiheleG7DtQIY"
     return twitter.OAuth(OAUTH_TOKEN, OAUTH_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
 
-def search_tweets(term, auth=None, result_type="recent", limit=300, lang='en'):
+def get_tweet_page(term, page, auth):
+    """ Uses the Twitter API to search for tweets. Gets 100 at a time. Returns
+    a list of json dicts of tweets according to the search term.
+
+    term - search term
+    page - page to get
+    auth - authorization. from twittersentiment.authenticate()
+    """
+    ts = twitter.Twitter(domain="search.twitter.com", auth=auth)
+
+    # print "getting tweet page", page, term
+    result = ts.search(q = term, page = page, lang = 'en', rpp = 100,
+                    result_type = "recent", include_entities = 'true')
+    # print page, "ZOMG!", result['results']
+    return result['results']
+
+class DocumentDownloader(threading.Thread):
+    """ A class to download tweets from twitter. Basically you start the threads and dump pages to search for in the queue.
+
+    Implementation from: https://gist.github.com/ghl3/4556336
+    http://www.spontaneoussymmetry.com/blog/archives/445
+    """
+    
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self._stop = threading.Event()
+        self.articles = []
+        self.queue = queue
+
+    def stop(self):
+        self._stop.set()
+
+    def stopped(self):
+        return self._stop.isSet()
+
+    def get_articles(self):
+        return self.articles
+
+    def run(self):
+        while True:
+            if self.stopped():
+                return
+            if self.queue.empty(): 
+                time.sleep(0.1)
+                continue
+            try:
+                term, p, auth = self.queue.get()
+                article = get_tweet_page(term, p, auth)
+                self.articles.extend(article)
+                # print "Successfully processed page: ", p,
+                # print " by thread: ", self.ident
+                # No need for a 'queue.task_done' since we're 
+                # not joining on the queue
+            except:
+                print "Failed to process page: ", p
+
+def search_tweets(term, limit=300, auth=None, num_threads=3):
     """ Uses the Twitter API to search for tweets.  Returns a list of json 
     dicts of tweets according to the search term.
     """
@@ -42,22 +101,72 @@ def search_tweets(term, auth=None, result_type="recent", limit=300, lang='en'):
     if limit > 1500:
         print "limit %d is too large, resetting to 1500" % limit
         limit = 1500
+    if limit < 100:
+        print "limit %d is too small, resetting to 100" % limit
+        limit = 100
 
-    ts = twitter.Twitter(domain="search.twitter.com", auth=auth)
+    q = Queue()
+    threads = []
 
-    result = []
+    # Create the threads and 'start' them.
+    # At this point, they are listening to the
+    # queue, waiting to consume
+    for i in xrange(num_threads):
+        thread = DocumentDownloader(q)
+        thread.setDaemon(True)
+        thread.start()
+        threads.append(thread)
+
+    # We want to download one page for each namespace,
+    # so we put every namespace in the queue, and
+    # these will be processed by the threads
     for p in range(limit // fetchlimit):
-        r = ts.search(q=term,
-                    result_type="recent",
-                    rpp=fetchlimit,
-                    page=p+1,
-                    lang = lang,
-                    include_entities = 'true')
-        if len(r) == 0: # we have no results anymore. stop.
-            return result
-        result.extend( r['results'])
+        q.put((term, p+1, auth))
+
+    # Wait for all entries in the queue
+    # to be processed by our threads
+    # One could do a queue.join() here, 
+    # but I prefer to use a loop and a timeout
+    while not q.empty():
+        time.sleep(0.1)
+
+    # Terminate the threads once our
+    # queue has been fully processed
+    for thread in threads:
+        thread.stop()
+    for thread in threads:
+        thread.join()
+
+    # except:
+    #     print "Main thread hit exception"
+    #     # Kill any running threads
+    #     for thread in threads:
+    #         thread.stop()
+    #     for thread in threads:
+    #         thread.join()
+    #     raise
+
+    # Collect all downloaded documents
+    # from our threads
+    result = []
+    for thread in threads:
+        # print "thread articles", type(thread.get_articles()), thread.get_articles()
+        result.extend(thread.get_articles())
 
     return result
+    #     
+    # result = []
+    # for p in range(limit // fetchlimit):
+    #     result.exten( )
+    #     r = ts.search(q=term,
+    #                 result_type="recent",
+    #                 rpp=fetchlimit,
+    #                 page=p+1,
+    #                 lang = lang,
+    #                 include_entities = 'true')
+    #     if len(r) == 0: # we have no results anymore. stop.
+    #         return result
+    #     result.extend( get_tweet_page(term, p+1, auth, result_type))
 
 def insert(query_with_sent, tweets_with_sent):
     """ Insert a query and sentiment information into the database.
