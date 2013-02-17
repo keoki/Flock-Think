@@ -350,7 +350,6 @@ def search_get_sentiment(term, auth=None):
     filtered = remove_tweets(raw)
     pos, neu, neg = sort_by_sentiment(filtered)
 
-    cutoff_pct = 0.10
-    top_pos = get_top_words(pos, filter_term=term.lower(), cutoff=int(cutoff_pct*len(pos)))
-    top_neg = get_top_words(neg, filter_term=term.lower(), cutoff=int(cutoff_pct*len(neg)))
+    top_pos = get_top_words(pos, filter_term=term.lower())
+    top_neg = get_top_words(neg, filter_term=term.lower())
     return pos, neg, top_pos, top_neg, neu

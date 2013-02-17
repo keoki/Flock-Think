@@ -1,15 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-<style type="text/css">
-	.slice text {
-		font-size: 16pt;
-	}
-  .row-fluid h1 {
-		font-size: 65px;
-		line-height: 65px;
-  }
-</style>
-<br>
 <div class="row-fluid">
 	<div class="span12" style="text-align: center">
 		<h1>
@@ -35,11 +25,10 @@
 	<div class="span6" style="text-align: center">
 		<h3>The Good</h3>
 		{% for tweet in pos %}
-		<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
 		<blockquote class="twitter-tweet">
 			<p>{{ tweet['text'] }}</p>&mdash;
 			{{tweet['from_user_name']}} (@{{tweet['from_user']}})
-			<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
+			<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}"></a>
 		</blockquote>
 		{% endfor %}
 	</div>
@@ -51,10 +40,8 @@
 		<blockquote class="twitter-tweet">
 			<p>{{ tweet['text'] }}</p>&mdash;
 			{{tweet['from_user_name']}} (@{{tweet['from_user']}})
-			<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}">{{tweet['formatted_date']}}</a>
+			<a href="https://twitter.com/{{tweet['from_user']}}/status/{{tweet['id_str']}}"></a>
 		</blockquote>
-
-		<!-- <p> @{{tweet['from_user']}}: {{ tweet['text'] }} </p> -->
 		{% endfor %}
 	</div>
 </div>
