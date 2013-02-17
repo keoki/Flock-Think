@@ -35,6 +35,39 @@ def get_word(statsdict):
         else: 
             return ["rad", "good", "sweet", "great"], "#ABFF83"
 
+def compare_terms(terms):
+    """ Compares a list of terms by sentiment on twitter.  Returns a dictionary of terms with sentiment (pos, neg, neu, pct_pos, pct_neg, pct_neu)
+    """
+    result = dict()
+    for t in terms:
+        r = { "term": t }
+        try:
+            pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(t, auth)
+            if len(pos) + len(neg) + len(neu) == 0:
+                for s in ('pos', 'neg', 'neu'):
+                    r[s] = []
+                continue
+
+        except ts.twitter.TwitterHTTPError:
+            # Twitter Error!
+            for s in ('pos', 'neg', 'neu'):
+                r[s] = []
+            continue
+        
+        r['pos'] = len(pos)
+        r['neg'] = len(neg)
+        r['neu'] = len(neu)
+        r['sum'] = r['pos'] + r['neg'] + r['neu']
+        r['pct_pos'] = int(100.0*r['pos']/float(r['sum']))
+        r['pct_neu'] = int(100.0*r['neu']/float(r['sum']))
+        r['pct_neg'] = int(100.0*r['neg']/float(r['sum']))
+        r['top_pos'] = len(top_pos)
+        r['top_neg'] = len(top_neg)
+
+        result[t] = r
+
+    return result
+
 @app.route('/')
 def search_page():
     return render_template("index.html", title=title)
@@ -46,6 +79,12 @@ def about():
 @app.route('/search/<term>')
 def search_term(term):
     term = (urllib.unquote(term)).strip() # remove whitespace on edges
+    if term.find(",") != -1:
+        terms = term.split(",")
+        terms = [t.strip() for t in terms]
+        result = compare_terms(terms)
+        return render_template("compare.html", result=result)
+
     try:
         pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
         if len(pos) + len(neg) + len(neu) == 0:
@@ -74,29 +113,29 @@ def search_term(term):
     
     # print stats
     words, color = get_word(stats)
-
-    # trim top tweets down.  pos/neg are sorted by sentiment
-    tweet_limit = 8
-
-    pos = trim_tweets(pos, tweet_limit)
-    neg = trim_tweets(neg, tweet_limit)
-
-    for i, t in enumerate(pos):
-        pos[i]['formatted_date'] = parse(t['created_at']).strftime("%B %d %Y")
-        
-    top_pos = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_pos ]
-    top_neg = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_neg ]
-
     text = dict()
     text['term'] = term
     text['text_result'] = words[random.randint(0, len(words)-1)]
     text['color'] = color
+
+    # trim top tweets down.  pos/neg are sorted by sentiment
+    tweet_limit = 8
+    pos = trim_tweets(pos, tweet_limit)
+    neg = trim_tweets(neg, tweet_limit)
+        
+    top_pos = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_pos ]
+    top_neg = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_neg ]
 
     return render_template("results.html", pos=pos, pos_words=top_pos, neg=neg, neg_words=top_neg, stats=stats, text=text)
 
 @app.route('/api/<term>')
 def api(term):
     term = (urllib.unquote(term)).strip()
+    if term.find(",") != -1:
+        terms = term.split(",")
+        terms = [t.strip() for t in terms]
+        result = compare_terms(terms)
+        return json.dumps(result)
 
     stats = dict()
     stats['term'] = term
