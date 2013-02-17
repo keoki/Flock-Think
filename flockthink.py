@@ -64,6 +64,11 @@ def compare_terms(terms):
         r['top_pos'] = len(top_pos)
         r['top_neg'] = len(top_neg)
 
+        try:
+            ts.insert(r, pos+neg+neu)
+        except:
+            app.logger.error("Could not insert into database. Query was %s." % term)
+
         result[t] = r
 
     return result
