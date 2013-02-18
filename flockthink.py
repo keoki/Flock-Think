@@ -67,7 +67,7 @@ def compare_terms(terms):
         try:
             ts.insert(r, pos+neg+neu)
         except:
-            app.logger.error("Could not insert into database. Query was %s." % term)
+            app.logger.error("Could not insert into database. Query was %s." % t)
 
         result[t] = r
 
@@ -169,7 +169,8 @@ def api(term):
     except:
         pass
 
-    return json.dumps(stats)
+    # to be consistent with the multi-search, we must return a dict that looks like: { 'term': stats }
+    return json.dumps({'term': stats})
 
 @app.route('/search', methods=['POST'])
 def search():

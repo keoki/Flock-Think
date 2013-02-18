@@ -105,6 +105,8 @@ def search_tweets(term, limit=300, auth=None, num_threads=3):
         print "limit %d is too small, resetting to 100" % limit
         limit = 100
 
+    pages = limit // fetchlimit
+
     q = Queue()
     threads = []
 
@@ -120,7 +122,7 @@ def search_tweets(term, limit=300, auth=None, num_threads=3):
     # We want to download one page for each namespace,
     # so we put every namespace in the queue, and
     # these will be processed by the threads
-    for p in range(limit // fetchlimit):
+    for p in range(pages):
         q.put((term, p+1, auth))
 
     # Wait for all entries in the queue

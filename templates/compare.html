@@ -5,7 +5,7 @@
 <div class="row-fluid">
 	<div class="span8 offset2" style="text-align: center">
 		<table class="table table-striped table-bordered">
-			<caption>Comparing {{", ".join(result.keys())}}</caption>
+			<caption>Comparing {{", ".join(result.keys())}}.</caption>
 			<thead>
 				<tr>
 					<th> Term </th>
@@ -17,7 +17,7 @@
 			<tbody>
 				{% for term, stats in result.iteritems() %}
 				<tr> 
-					<td> {{ term }} </td>
+					<td> <a href="/search/{{term}}">{{ term }}</a> </td>
 					<td> {{ stats['pct_pos'] }} </td>
 					<td> {{ stats['pct_neg'] }} </td>
 					<td> {{ stats['pct_neu'] }} </td>
