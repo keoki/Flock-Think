@@ -149,12 +149,12 @@ def api(term):
         pos, neg, top_pos, top_neg, neu = ts.search_get_sentiment(term, auth)
         if len(pos) + len(neg) + len(neu) == 0:
             stats['error'] = "No search results"
-            return json.dumps(stats)
+            return json.dumps({term: stats})
 
     except ts.twitter.TwitterHTTPError:
         # Twitter Error!
         stats['error'] = "Could not connect to twitter"
-        return json.dumps(stats)
+        return json.dumps({term: stats})
 
     stats['pos'] = len(pos)
     stats['neg'] = len(neg)
@@ -170,7 +170,7 @@ def api(term):
         pass
 
     # to be consistent with the multi-search, we must return a dict that looks like: { 'term': stats }
-    return json.dumps({'term': stats})
+    return json.dumps({term: stats})
 
 @app.route('/search', methods=['POST'])
 def search():
