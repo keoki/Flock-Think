@@ -132,6 +132,10 @@ def search_term(term):
     top_neg = [ (t[0], urllib.quote(t[0]), t[1]) for t in top_neg ]
 
     return render_template("results.html", pos=pos, pos_words=top_pos, neg=neg, neg_words=top_neg, stats=stats, text=text)
+@app.route('/cache/<term>')
+def cache(term):
+    print term
+    return render_template("%s.html" % term)
 
 @app.route('/api/<term>')
 def api(term):
