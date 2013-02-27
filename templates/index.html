@@ -6,22 +6,22 @@
 <link type="text/css" href="/static/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet">
 <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <title>FlockThink</title>
+<script type="text/javascript">
+  // Google Analytics
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-38623235-1']);
+  _gaq.push(['_setDomainName', 'flockthink.com']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </head>
 <body>
-	<script type="text/javascript">
-	  // Google Analytics
-	  var _gaq = _gaq || [];
-	  _gaq.push(['_setAccount', 'UA-38623235-1']);
-	  _gaq.push(['_setDomainName', 'flockthink.com']);
-	  _gaq.push(['_trackPageview']);
-
-	  (function() {
-	    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-	    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-	  })();
-
-	</script>
 <div class="jumbotron" style="margin-top: 50px; text-align:center">
 		<h1>Welcome to FlockThink</h1>
 		FlockThink is the Twitter search engine for instant sentiment analysis.
