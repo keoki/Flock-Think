@@ -27,7 +27,7 @@ def get_word(statsdict):
         if diff < -20: # really bad
             return ["terrible", "awful", "bad" ], "FCB2AE"
         else:
-            return [ "poor", "icky", "smelly" ], "FCB2AE"
+            return [ "poor", "icky", "smelly", "abominable" ], "FCB2AE"
         
     else: # effectively diff > 10 (happy)
         if diff > 20: # really good
