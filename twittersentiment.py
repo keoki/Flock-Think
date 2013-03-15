@@ -39,10 +39,8 @@ def get_tweet_page(term, page, auth):
     """
     ts = twitter.Twitter(domain="search.twitter.com", auth=auth)
 
-    # print "getting tweet page", page, term
     result = ts.search(q = term, page = page, lang = 'en', rpp = 100,
                     result_type = "recent", include_entities = 'true')
-    # print page, "ZOMG!", result['results']
     return result['results']
 
 class DocumentDownloader(threading.Thread):
@@ -88,6 +86,13 @@ class DocumentDownloader(threading.Thread):
 def search_tweets(term, limit=300, auth=None, num_threads=3):
     """ Uses the Twitter API to search for tweets.  Returns a list of json 
     dicts of tweets according to the search term.
+    arguments:
+        term - term to search for
+        limit - number of tweets to get. defaults to 300
+        auth - authentication. from authenticate()
+        num_threads - number of threads to fetch the data.  Defaults to 3.
+    returns:
+        a list of dicts of tweets
     """
     if not auth:
         auth = authenticate()
@@ -156,19 +161,6 @@ def search_tweets(term, limit=300, auth=None, num_threads=3):
         result.extend(thread.get_articles())
 
     return result
-    #     
-    # result = []
-    # for p in range(limit // fetchlimit):
-    #     result.exten( )
-    #     r = ts.search(q=term,
-    #                 result_type="recent",
-    #                 rpp=fetchlimit,
-    #                 page=p+1,
-    #                 lang = lang,
-    #                 include_entities = 'true')
-    #     if len(r) == 0: # we have no results anymore. stop.
-    #         return result
-    #     result.extend( get_tweet_page(term, p+1, auth, result_type))
 
 def insert(query_with_sent, tweets_with_sent):
     """ Insert a query and sentiment information into the database.
@@ -213,9 +205,9 @@ def remove_tweets(tweets, remove_rt = True):
 
 def get_raw_sentiment(tweets):
     """Get the raw sentiment from a tweet.  The sentiment factor returned is a pair of numbers whose sum is 1.  The first is the positive sentiment, and the second is the negative sentiment.
+
     Returns a list of tweets in the form (pos_sent, neg_sent, raw_tweet)
     """
-    # t = [t['text'] for t in tweets]
     t = clean_tweets(tweets) # gives us a list of tweets that have been processed
     
     result = classifier.predict_proba(t)
@@ -232,7 +224,8 @@ t_url = re.compile('htt[p|ps]://t.co/[a-zA-Z0-9\-\.]{8}')
 t_repeated = re.compile('([a-z])\1{3,25}')
 def clean_tweets(tweets):
     """Clean tweets from twitter and remove the usernames, urls and repeated letters.
-    tweets is an iterable of tweet json objects
+    tweets is an iterable of tweet dicts
+    removes the same list except the usernames and urls are tokenized, and repeated letters are removed.
     """
     outlist = []
     # from: Twitter Sentiment Classification using Distant Supervision
@@ -245,19 +238,16 @@ def clean_tweets(tweets):
         # found_username = True if re.search(t_username, t['text']) else False
         # found_url = True if re.search(t_url, t['text']) else False
         rtext = re.sub(t_username, "USERNAME",  t['text'])
-        # print rtext
         rtext = re.sub(t_url, "URL", rtext)
-
-        # print rtext
         rtext = re.sub(r'([a-z])\1{2,25}', r'\1\1', rtext)
 
-        # print "text!", rtext, t['text']
         outlist.append( rtext )
 
     return outlist
 
 def sort_by_sentiment(tweets):
     """ Sorts tweets by sentiment.
+    returns 3 lists of sentiment (pos, neu, neg). The tweets for pos and neu are sorted from most positive to most negative, and neg is sorted in reverse so that the most negative tweet is at the start of the list.
     """
     st = get_raw_sentiment(tweets)
 
@@ -285,6 +275,8 @@ def get_top_words(tweetlist, filter_term=None, filter_common = True, cutoff=3, r
     filter_common = remove common words
     filter_term - other term to remove (ie: search term)
     remove_words_shorter_than - remove words shorter than or equal to this value
+    
+    returns a dictionary of word: # occurrence values.  
     """
     combined_tweets = norm_words(" ".join([t['text'] for t in tweetlist]))
     # remove the quotations from the filter_term.  Probably should make this more general but I cannot figure out string.translate()
@@ -307,6 +299,8 @@ def get_top_words(tweetlist, filter_term=None, filter_common = True, cutoff=3, r
 
 def norm_words(words, lower=True, remove_punctuation = True, remove_http = True):
     """normalize words by converting to lower case and removing punctuation. Works on both lists of words and a single string, but it's recommenede that this be used on a single string rather than lists of words since norm_words can make some strings empty and it does not remove them.
+
+    returns a similar list as words except they have their punctuation and urls removed (default) and are lower case (default).
     """
 
     http_str = re.compile('htt[p|ps]://t.co/[a-zA-Z0-9\-\.]{8}')   
@@ -317,19 +311,14 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     if type(words) == unicode:
         words = words.encode("ascii", errors="ignore")
 
-    # print words
     if type(words) == str:
-        # print words
         if remove_http:
             words = re.sub(http_str, "", words)
-        # print words
         if lower:
             words = words.lower()
-        # print words
         if remove_punctuation:
             table = string.maketrans(sp, " "*len(sp))
             words = words.translate(table)
-        # print words
     elif type(words) in (list, tuple):
         if remove_http:
             words = [re.sub(http_str, "", w) for w in words]
@@ -341,10 +330,11 @@ def norm_words(words, lower=True, remove_punctuation = True, remove_http = True)
     else:
         print "not list or string, not normalizing"
 
-    # print words
     return words
 
 def search_get_sentiment(term, auth=None):
+    """ Function that encompasses the library to search on a term, get the sentiment, and return lists of the positve/negative/neutral sentiment tweets along with words associated with the top positive and negative tweets.
+    """
     raw = search_tweets(term, auth=auth)
     if len(raw) == 0: # No tweets :(
         return [], [], [], [], []
