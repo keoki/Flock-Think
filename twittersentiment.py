@@ -1,6 +1,7 @@
 import string
 import re
 import pickle
+import os
 from Queue import Queue
 import threading
 import time
@@ -23,10 +24,10 @@ stopwords = stopwords.words("english")
 # stopwords.append("RT")
 
 def authenticate():
-    OAUTH_TOKEN="167133966-EnnTYkbphBbmwo9FFd2hwv5JSkOaNSRSBsh4LzY"
-    OAUTH_SECRET="1Hni2nPVHjr5IPa7kqZUx5EnL14MjSvIvzkDhOiggK4"
-    CONSUMER_KEY = "IeREJaWROxAO7olEYLiQ"
-    CONSUMER_SECRET = "I0EVikHnnGU6wAzL7gl1nNuejIu2YuUiheleG7DtQIY"
+    OAUTH_TOKEN= os.environ["OAUTH_TOKEN"]
+    OAUTH_SECRET= os.environ["OAUTH_SECRET"]
+    CONSUMER_KEY = os.environ["CONSUMER_KEY"]
+    CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
     return twitter.OAuth(OAUTH_TOKEN, OAUTH_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
 
 def get_tweet_page(term, page, auth):
