@@ -174,7 +174,7 @@ def api(term):
         pass
 
     # to be consistent with the multi-search, we must return a dict that looks like: { 'term': stats }
-    return json.dumps({term: stats})
+    return render_template("json.html", json=json.dumps({term: stats}))
 
 @app.route('/search', methods=['POST'])
 def search():
